@@ -64,7 +64,7 @@ export function ExplanationModal({ candidate, onClose }) {
                           initial={{ width: 0 }}
                           animate={{ width: `${score}%` }}
                           transition={{ duration: 0.8 }}
-                          className="h-full bg-gradient-to-r from-purple-500 to-emerald-500"
+                          className="h-full bg-linear-to-r from-purple-500 to-emerald-500"
                         />
                       </div>
                       <span className="text-sm font-semibold text-purple-400">{score}%</span>
@@ -79,7 +79,7 @@ export function ExplanationModal({ candidate, onClose }) {
               <h3 className="font-semibold text-foreground mb-3">Fairness Analysis</h3>
               <div className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                 <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <Check className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-emerald-400 mb-1">Gender Influence</p>
                     <p className="text-sm text-muted-foreground">{candidate.genderInfluence}</p>
@@ -91,7 +91,7 @@ export function ExplanationModal({ candidate, onClose }) {
             {/* Recommendation */}
             <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
               <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold text-blue-400 mb-1">Our Recommendation</p>
                   <p className="text-sm text-muted-foreground">{candidate.recommendation}</p>
