@@ -1,0 +1,21 @@
+id,name,experience,qualification,gender,ethnicity,salary_expectation
+1,Alice Johnson,8,MS Computer Science,Female,Asian,120000
+2,Bob Smith,10,BS Engineering,Male,Caucasian,130000
+3,Carol Davis,5,BA Business,Female,African American,95000
+4,David Wilson,12,PhD Math,Male,Asian,140000
+5,Emma Martinez,6,MS Data Science,Female,Hispanic,110000
+6,Frank Chen,9,BS Computer Science,Male,Asian,125000
+7,Grace Lee,7,MS Statistics,Female,Asian,115000
+8,Henry Brown,11,MBA,Male,Caucasian,135000
+9,Iris Taylor,4,BS Psychology,Female,Caucasian,85000
+10,Jack Anderson,8,MS Engineering,Male,Caucasian,128000
+11,Karen White,6,BS Finance,Female,African American,100000
+12,Liam Garcia,9,MS Computer Science,Male,Hispanic,122000
+13,Michelle Jackson,5,BA Communications,Female,African American,88000
+14,Nathan Moore,10,MS Software Engineering,Male,Caucasian,132000
+15,Olivia Thomas,7,BS Information Technology,Female,Asian,112000
+16,Peter Jackson,8,MS Economics,Male,African American,118000
+17,Quinn Roberts,6,BA Marketing,Female,Caucasian,92000
+18,Robert Harris,11,PhD Engineering,Male,Caucasian,145000
+19,Sofia Kim,5,MS Chemistry,Female,Asian,108000
+20,Thomas Lopez,9,BS Accounting,Male,Hispanic,120000

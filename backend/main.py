@@ -1,0 +1,94 @@
+"""
+FastAPI backend for AI Hiring Fairness Auditor.
+
+Main application entry point with route registration and middleware setup.
+Ready to run with: uvicorn main:app --reload
+"""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+# Import route modules
+from routes import upload, metrics, candidates, shortlist, reports
+
+# Initialize FastAPI app
+app = FastAPI(
+    title="AI Hiring Fairness Auditor",
+    description="Backend API for auditing hiring fairness and detecting bias",
+    version="1.0.0"
+)
+
+# Configure CORS for Next.js frontend on localhost:3000
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+
+# Register route routers
+app.include_router(upload.router, tags=["Data Management"])
+app.include_router(metrics.router, tags=["Fairness Analysis"])
+app.include_router(candidates.router, tags=["Candidate Data"])
+app.include_router(shortlist.router, tags=["Shortlisting"])
+app.include_router(reports.router, tags=["Reports"])
+
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """
+    Simple health check endpoint.
+
+    Returns:
+        Status message
+    """
+    return JSONResponse(
+        status_code=200,
+        content={"status": "healthy", "service": "AI Hiring Fairness Auditor"}
+    )
+
+
+# Root endpoint
+@app.get("/")
+async def root():
+    """
+    API root endpoint with documentation links.
+
+    Returns:
+        API information and documentation links
+    """
+    return JSONResponse(
+        content={
+            "message": "AI Hiring Fairness Auditor API",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "endpoints": {
+                "upload": "POST /upload-csv - Upload candidate CSV",
+                "metrics": "GET /metrics - Get fairness metrics",
+                "candidates": "GET /candidates - Get processed candidates",
+                "shortlist": "GET /shortlist - Get original vs adjusted shortlist",
+                "report": "GET /report - Generate audit report",
+                "health": "GET /health - Health check"
+            }
+        }
+    )
+
+
+# Global error handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    """Handle uncaught exceptions."""
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error", "detail": str(exc)}
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
