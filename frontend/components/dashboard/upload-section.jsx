@@ -2,149 +2,160 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Upload, FileText, CheckCircle } from 'lucide-react'
+import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react'
 
 export function UploadSection() {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [rowCount, setRowCount] = useState(0)
+  const [error, setError] = useState('')
 
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const uploadFile = async (file) => {
+    if (!file) return
+
+    setIsUploading(true)
+    setUploadSuccess(false)
+    setUploadProgress(20)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      setUploadProgress(45)
+
+      const response = await fetch('http://localhost:8000/upload-csv', {
+        method: 'POST',
+        body: formData,
+      })
+
+      setUploadProgress(75)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Upload failed')
+      }
+
+      setUploadProgress(100)
+      setRowCount(data.rowCount || 0)
+      setUploadSuccess(true)
+      setIsUploading(false)
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    } catch (err) {
+      setError(err.message)
+      setIsUploading(false)
+      setUploadProgress(0)
+    }
   }
 
   const handleDrop = (e) => {
     e.preventDefault()
-    e.stopPropagation()
-    // Simulate file upload
-    startUpload()
+    const file = e.dataTransfer.files[0]
+    uploadFile(file)
   }
 
-  const startUpload = () => {
-    setIsUploading(true)
-    setUploadSuccess(false)
-    setUploadProgress(0)
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
 
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setIsUploading(false)
-          setUploadSuccess(true)
-          setTimeout(() => setUploadSuccess(false), 3000)
-          return 100
-        }
-        return prev + Math.random() * 30
-      })
-    }, 500)
+  const handleInput = (e) => {
+    const file = e.target.files[0]
+    uploadFile(file)
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-      className="p-6 rounded-lg glass-effect border border-purple-500/20"
+      className="p-6 rounded-xl bg-card border border-border"
     >
-      <h3 className="font-semibold mb-6 text-foreground">Import Candidate Data</h3>
+      <h3 className="font-semibold mb-6">Import Candidate Data</h3>
 
-      <motion.div
-        onDragOver={handleDragOver}
+      <div
         onDrop={handleDrop}
-        whileHover={{ scale: 1.01 }}
-        className="border-2 border-dashed border-purple-500/40 hover:border-purple-500 rounded-lg p-8 text-center transition-colors cursor-pointer group"
+        onDragOver={handleDragOver}
+        className="border-2 border-dashed border-purple-500/40 rounded-xl p-8 text-center"
       >
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="inline-block mb-4"
-        >
-          {uploadSuccess ? (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center"
-            >
-              <CheckCircle className="w-6 h-6 text-emerald-400" />
-            </motion.div>
-          ) : (
-            <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-              <Upload className="w-6 h-6 text-purple-400" />
-            </div>
-          )}
-        </motion.div>
-
         {uploadSuccess ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-2"
-          >
-            <p className="font-semibold text-emerald-400">Upload successful!</p>
-            <p className="text-sm text-muted-foreground">245 candidates imported and analyzed</p>
-          </motion.div>
+          <div className="space-y-3">
+            <CheckCircle className="mx-auto w-10 h-10 text-green-500" />
+            <p className="font-semibold text-green-500">Upload Successful</p>
+            <p className="text-sm text-muted-foreground">
+              {rowCount} candidates imported
+            </p>
+          </div>
         ) : isUploading ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
-            <p className="font-semibold text-foreground">Uploading...</p>
-            <div className="w-full h-2 bg-card rounded-full overflow-hidden">
-              <motion.div
-                animate={{ width: `${uploadProgress}%` }}
-                transition={{ duration: 0.3 }}
+          <div className="space-y-4">
+            <Upload className="mx-auto w-8 h-8 text-purple-500 animate-bounce" />
+            <p className="font-medium">Uploading CSV...</p>
+
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div
                 className="h-full bg-gradient-to-r from-purple-500 to-emerald-500"
+                style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="text-sm text-muted-foreground">{Math.round(uploadProgress)}%</p>
-          </motion.div>
-        ) : (
-          <motion.div className="space-y-2">
-            <p className="font-semibold text-foreground">Drag and drop CSV file here</p>
-            <p className="text-sm text-muted-foreground">or click to browse</p>
-            <p className="text-xs text-muted-foreground pt-2">Max file size: 50MB</p>
-          </motion.div>
-        )}
-      </motion.div>
 
-      {/* File input */}
-      <input
-        type="file"
-        accept=".csv"
-        onChange={() => startUpload()}
-        className="hidden"
-        id="csv-upload"
-      />
+            <p className="text-sm text-muted-foreground">
+              {uploadProgress}%
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Upload className="mx-auto w-10 h-10 text-purple-500" />
+            <p className="font-semibold">Drag & Drop CSV File</p>
+            <p className="text-sm text-muted-foreground">
+              or click below to browse
+            </p>
+          </div>
+        )}
+      </div>
 
       {!isUploading && !uploadSuccess && (
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => document.getElementById('csv-upload').click()}
-          className="mt-4 px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-colors"
-        >
-          Browse Files
-        </motion.button>
+        <>
+          <input
+            type="file"
+            accept=".csv"
+            id="csv-upload"
+            className="hidden"
+            onChange={handleInput}
+          />
+
+          <button
+            onClick={() => document.getElementById('csv-upload').click()}
+            className="mt-4 px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold"
+          >
+            Browse Files
+          </button>
+        </>
       )}
 
-      {/* Template download */}
-      <div className="mt-6 p-4 rounded-lg bg-card/30 border border-border">
-        <div className="flex items-start gap-3">
-          <FileText className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+      {error && (
+        <div className="mt-4 flex gap-2 items-center text-red-500 text-sm">
+          <AlertCircle className="w-4 h-4" />
+          {error}
+        </div>
+      )}
+
+      <div className="mt-6 p-4 rounded-xl border bg-muted/30">
+        <div className="flex gap-3">
+          <FileText className="w-5 h-5 text-purple-500 mt-1" />
           <div>
-            <p className="font-medium text-foreground text-sm mb-1">Need a template?</p>
-            <p className="text-xs text-muted-foreground mb-2">Download our CSV template to ensure proper formatting</p>
-            <motion.a
-              whileHover={{ scale: 1.02 }}
-              href="#"
-              className="inline-block text-sm text-purple-400 hover:text-purple-300 font-semibold"
+            <p className="font-medium text-sm">Need a template?</p>
+            <p className="text-xs text-muted-foreground mb-2">
+              Use our sample CSV format
+            </p>
+            <a
+              href="/sample-template.csv"
+              className="text-sm text-purple-500 font-semibold"
             >
               Download Template
-            </motion.a>
+            </a>
           </div>
         </div>
       </div>

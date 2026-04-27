@@ -106,7 +106,7 @@ export function Pricing() {
 
                 {/* Price */}
                 <div className="mb-8">
-                  {tier.price ? (
+                  {tier.price !== "Custom" ? (
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold text-foreground">${tier.price}</span>
                       <span className="text-muted-foreground">/month</span>

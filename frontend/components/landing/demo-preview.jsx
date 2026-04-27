@@ -2,7 +2,8 @@
 
 import { motion, useInView } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { useRouter } from 'next/navigation'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 
 const demoData = [
   { month: 'Jan', named: 0.68, anonymized: 0.71 },
@@ -39,8 +40,14 @@ function AnimatedValue({ end, duration = 2 }) {
 }
 
 export function DemoPreview() {
+  const router = useRouter()
+
+  const handleTryDemo = () => {
+    router.push('/dashboard')
+  }
+
   return (
-    <section className="py-20 px-4 bg-background">
+    <section id="demo-preview" className="py-20 px-4 bg-background">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -130,10 +137,10 @@ export function DemoPreview() {
           >
             <h3 className="font-semibold mb-6 text-foreground">Acceptance Rate Trend</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={demoData}>
+              <LineChart data={demoData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" />
-                <YAxis stroke="rgba(255,255,255,0.5)" />
+                <YAxis stroke="rgba(255,255,255,0.5)" domain={[0.6, 0.9]} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'rgba(31, 41, 55, 0.8)',
@@ -142,13 +149,14 @@ export function DemoPreview() {
                   }}
                   labelStyle={{ color: '#f9fafb' }}
                 />
+                <Legend wrapperStyle={{ paddingTop: '20px' }} />
                 <Line
                   type="monotone"
                   dataKey="named"
                   stroke="#ef4444"
                   name="With Names"
                   dot={false}
-                  strokeWidth={2}
+                  strokeWidth={3}
                 />
                 <Line
                   type="monotone"
@@ -156,7 +164,7 @@ export function DemoPreview() {
                   stroke="#10b981"
                   name="Anonymized"
                   dot={false}
-                  strokeWidth={2}
+                  strokeWidth={3}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -174,7 +182,10 @@ export function DemoPreview() {
           <p className="text-muted-foreground mb-4">
             See how much bias we can eliminate from your hiring process
           </p>
-          <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30">
+          <button
+            onClick={handleTryDemo}
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/30 cursor-pointer"
+          >
             Try the Demo
           </button>
         </motion.div>

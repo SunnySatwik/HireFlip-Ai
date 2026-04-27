@@ -41,10 +41,10 @@ export function StatsStrip() {
   }
 
   return (
-    <section className="py-12 px-4 bg-card/50 border-y border-border/50 backdrop-blur">
+    <section className="py-8 px-4 bg-card/50 border-y border-border/50 backdrop-blur">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -58,7 +58,7 @@ export function StatsStrip() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="text-center py-4"
+              className="text-center py-2"
             >
               <div className="inline-block">
                 <div className="text-4xl md:text-5xl font-bold gradient-text mb-2">

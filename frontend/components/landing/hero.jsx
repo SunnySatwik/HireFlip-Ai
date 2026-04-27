@@ -2,8 +2,16 @@
 
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import Link from "next/link";
+import Link from "next/link"
+
 export function Hero() {
+  const scrollToDemo = () => {
+    const demoElement = document.getElementById('demo-preview')
+    if (demoElement) {
+      demoElement.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -22,7 +30,7 @@ export function Hero() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-20 pt-32 bg-gradient-to-b from-background to-background/50">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 pt-28 bg-gradient-to-b from-background to-background/50">
       <motion.div
         className="max-w-5xl mx-auto w-full"
         variants={containerVariants}
@@ -60,7 +68,8 @@ export function Hero() {
           <Button
             size="lg"
             variant="outline"
-            className="border-purple-400/50 text-foreground hover:bg-purple-500/10 h-12 px-8 text-base font-semibold rounded-lg"
+            onClick={scrollToDemo}
+            className="border-purple-400/50 text-foreground hover:bg-purple-500/10 h-12 px-8 text-base font-semibold rounded-lg cursor-pointer"
           >
             Watch Demo
           </Button>

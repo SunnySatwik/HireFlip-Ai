@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { howItWorks } from '@/data/mock-data'
+import Link from 'next/link'
 import {
   ArrowRight,
   Database,
@@ -128,9 +129,11 @@ export function HowItWorks() {
             Ready to build a fairer hiring process?
           </p>
 
-          <button className="px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-emerald-500 hover:scale-105 transition-all duration-300 shadow-xl shadow-purple-500/20">
-            Get Started Free
-          </button>
+          <Link href="/dashboard">
+            <button className="px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-emerald-500 hover:scale-105 transition-all duration-300 shadow-xl shadow-purple-500/20 cursor-pointer">
+              Get Started Free
+            </button>
+          </Link>
         </motion.div>
       </div>
     </section>

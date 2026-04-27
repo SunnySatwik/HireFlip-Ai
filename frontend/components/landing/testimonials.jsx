@@ -81,18 +81,18 @@ export function Testimonials() {
 
                 {/* Quote */}
                 <p className="text-foreground mb-6 flex-1 leading-relaxed text-sm">
-                  &ldquo;{testimonial.text}&rdquo;
+                  &ldquo;{testimonial.quote}&rdquo;
                 </p>
 
                 {/* Author */}
                 <div className="flex items-center gap-3 pt-4 border-t border-border">
                   <img
                     src={testimonial.avatar}
-                    alt={testimonial.author}
-                    className="w-10 h-10 rounded-full"
+                    alt={testimonial.name}
+                    className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <p className="font-semibold text-sm text-foreground">{testimonial.author}</p>
+                    <p className="font-semibold text-sm text-foreground">{testimonial.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {testimonial.title} at {testimonial.company}
                     </p>

@@ -9,9 +9,9 @@ export const metrics = {
 };
 
 export const stats = [
-  { label: "Biased AI Tools", value: 67, suffix: "%" },
-  { label: "Talent Market Impacted", value: 500, suffix: "B+" },
-  { label: "Combined Audit + Fix Tools", value: 0, suffix: "" },
+  { label: "Average Bias Reduction", value: 42, suffix: "%" },
+  { label: "Active Users", value: 2400, suffix: "+" },
+  { label: "Audits Completed", value: 48000, suffix: "+" },
 ];
 
 export const howItWorks = [
@@ -34,38 +34,61 @@ export const testimonials = [
   {
     name: "Sarah Chen",
     company: "TalentForge",
-    quote: "HireFlip helped us uncover hidden hiring bias in minutes.",
+    title: "Head of Talent",
+    quote: "HireFlip helped us uncover hidden hiring bias in minutes. The insights were eye-opening.",
     rating: 5,
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
   },
   {
     name: "Michael Rao",
     company: "ScaleOps",
-    quote: "The fairness dashboard impressed our leadership team.",
+    title: "VP of People",
+    quote: "The fairness dashboard impressed our leadership team. We've reduced bias by 40% in 3 months.",
     rating: 5,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
   },
   {
     name: "Alicia Gomez",
     company: "NovaHR",
-    quote: "Exactly what modern recruiting needed.",
+    title: "Recruiting Director",
+    quote: "Exactly what modern recruiting needed. Our hiring is now fairer and faster.",
     rating: 5,
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+  },
+  {
+    name: "James Wilson",
+    company: "CloudCore",
+    title: "Chief People Officer",
+    quote: "HireFlip gave us the transparency we needed in our hiring decisions. Highly recommend.",
+    rating: 5,
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop",
   },
 ];
 
 export const pricingTiers = [
   {
     name: "Starter",
-    price: "$0",
-    features: ["3 audits/month", "Basic reports", "CSV upload"],
+    price: "0",
+    description: "For teams getting started with fairness audits",
+    cta: "Start Free",
+    recommended: false,
+    features: ["3 audits/month", "Basic reports", "CSV upload", "Email support"],
   },
   {
     name: "Growth",
-    price: "$49",
-    features: ["Unlimited audits", "Advanced analytics", "Priority support"],
+    price: "49",
+    description: "For growing companies scaling their hiring",
+    cta: "Start Free Trial",
+    recommended: true,
+    features: ["Unlimited audits", "Advanced analytics", "Priority support", "API access", "Custom reports"],
   },
   {
     name: "Enterprise",
     price: "Custom",
-    features: ["SSO", "Compliance suite", "Dedicated manager"],
+    description: "For large organizations with custom needs",
+    cta: "Contact Sales",
+    recommended: false,
+    features: ["SSO & SAML", "Compliance suite", "Dedicated manager", "SLA guarantee", "Custom integrations"],
   },
 ];
 
