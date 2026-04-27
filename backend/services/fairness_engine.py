@@ -148,3 +148,120 @@ def get_fairness_metrics(df: pd.DataFrame) -> Dict:
             "genderGroups": int(df['gender'].nunique()) if 'gender' in df.columns else 0,
         }
     }
+
+
+# New deterministic scoring functions
+def parse_qualification_level(qualification: str) -> float:
+    """
+    Parse degree level from qualification string.
+
+    Returns normalized qualification score (0-1):
+    - BS/BA: 0.5
+    - MS/MA: 0.75
+    - MBA: 0.8
+    - PhD: 1.0
+    - Default: 0.5
+    """
+    if not qualification or not isinstance(qualification, str):
+        return 0.5
+
+    qual_lower = qualification.lower()
+
+    if 'phd' in qual_lower or 'doctorate' in qual_lower:
+        return 1.0
+    elif 'mba' in qual_lower:
+        return 0.8
+    elif 'ms' in qual_lower or 'ma' in qual_lower or 'master' in qual_lower:
+        return 0.75
+    elif 'bs' in qual_lower or 'ba' in qual_lower or 'bachelor' in qual_lower:
+        return 0.5
+    else:
+        return 0.5
+
+
+def calculate_salary_fit(salary_expectation: float, max_salary: float) -> float:
+    """
+    Calculate salary fit score (inverse relationship).
+
+    Lower salary expectation = better fit within budget.
+    Formula: 1.0 - (salary / max_salary) clamped to [0, 1]
+    """
+    if max_salary <= 0 or salary_expectation <= 0:
+        return 0.5
+
+    fit = 1.0 - (salary_expectation / max_salary)
+    return float(np.clip(fit, 0, 1))
+
+
+def calculate_deterministic_score(candidate_row, max_experience: float, max_salary: float) -> Tuple[float, Dict]:
+    """
+    Calculate deterministic candidate score with decision factors breakdown.
+
+    Formula: (experience_pct * 0.5 + qualification * 0.3 + salary_fit * 0.2) * 100
+
+    Args:
+        candidate_row: Row from DataFrame containing experience, qualification, salary_expectation
+        max_experience: Maximum experience value in dataset for normalization
+        max_salary: Maximum salary in dataset for normalization
+
+    Returns:
+        Tuple of (score: 0-100, factors: Dict with component breakdown)
+    """
+    try:
+        experience = float(candidate_row.get('experience', 0))
+        qualification = str(candidate_row.get('qualification', ''))
+        salary = float(candidate_row.get('salary_expectation', 0))
+
+        # Calculate normalized components
+        experience_pct = experience / max_experience if max_experience > 0 else 0
+        qualification_score = parse_qualification_level(qualification)
+        salary_fit = calculate_salary_fit(salary, max_salary)
+
+        # Weighted score
+        score = (experience_pct * 0.5 + qualification_score * 0.3 + salary_fit * 0.2) * 100
+
+        factors = {
+            'experience': round(experience_pct, 3),
+            'qualification': round(qualification_score, 3),
+            'salary_fit': round(salary_fit, 3),
+            'fairness_adjustment': 0.0  # Will be set separately by fairness engine
+        }
+
+        return float(round(score, 2)), factors
+
+    except Exception as e:
+        # Fallback on error
+        return 50.0, {'experience': 0, 'qualification': 0.5, 'salary_fit': 0.5, 'fairness_adjustment': 0.0}
+
+
+def calculate_candidate_confidence(score: float, qualification_score: float, experience_ratio: float) -> float:
+    """
+    Calculate confidence score for candidate viability.
+
+    Formula: (score/100 * 0.4 + qualification * 0.4 + experience_ratio * 0.2) * 100
+
+    Represents: How confident we are in this candidate's overall fit
+    """
+    try:
+        confidence = (score / 100 * 0.4 + qualification_score * 0.4 + experience_ratio * 0.2) * 100
+        return float(np.clip(confidence, 0, 100))
+    except Exception:
+        return 50.0
+
+
+def calculate_gender_influence(original_score: float, adjusted_score: float) -> float:
+    """
+    Calculate the percentage impact of fairness adjustment on score.
+
+    Formula: ((adjusted_score - original_score) / original_score) * 100
+
+    Returns: Percentage change (typically ±0-5% since fairness boost is capped at 5%)
+    """
+    if original_score <= 0:
+        return 0.0
+
+    try:
+        influence = ((adjusted_score - original_score) / original_score) * 100
+        return float(round(influence, 2))
+    except Exception:
+        return 0.0

@@ -167,3 +167,50 @@ def get_shortlist_comparison(df: pd.DataFrame, top_n: int = 10) -> Dict:
         "adjusted_demographics": get_demographics(adjusted),
         "adjustments": adjustments
     }
+
+
+def classify_candidate_status(df: pd.DataFrame, fairness_adjusted_col: str = 'fairnessAdjustedScore') -> List[str]:
+    """
+    Classify candidates as Shortlisted, In Review, or Rejected based on fairness-adjusted scores.
+
+    Classification Logic:
+    - Shortlisted: Top candidates (50th percentile and above, or top 10 if < 20 total)
+    - In Review: Next tier (bottom 50th percentile but above rejected threshold)
+    - Rejected: Bottom candidates (below 50th percentile)
+
+    Args:
+        df: Candidate dataframe with fairness-adjusted scores
+        fairness_adjusted_col: Column name containing fairness-adjusted scores
+
+    Returns:
+        List of status strings matching DataFrame row order
+    """
+    if fairness_adjusted_col not in df.columns:
+        return ['In Review'] * len(df)
+
+    df_sorted = df.sort_values(fairness_adjusted_col, ascending=False).copy()
+
+    # Determine shortlist size
+    shortlist_size = min(10, max(1, len(df) // 2))
+
+    # Get threshold score for shortlist
+    if shortlist_size < len(df):
+        shortlist_threshold = df_sorted[fairness_adjusted_col].iloc[shortlist_size - 1]
+    else:
+        shortlist_threshold = df_sorted[fairness_adjusted_col].min()
+
+    # Calculate 50th percentile
+    median_score = df[fairness_adjusted_col].median()
+
+    # Assign statuses
+    statuses = []
+    for _, row in df.iterrows():
+        score = row[fairness_adjusted_col]
+        if score >= shortlist_threshold:
+            statuses.append('Shortlisted')
+        elif score >= median_score:
+            statuses.append('In Review')
+        else:
+            statuses.append('Rejected')
+
+    return statuses

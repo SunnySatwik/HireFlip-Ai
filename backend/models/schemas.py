@@ -34,6 +34,10 @@ class Candidate(BaseModel):
     salary_expectation: float
     score: float
     fairnessAdjustedScore: float
+    status: Optional[str] = "In Review"  # Shortlisted, In Review, Rejected
+    confidence: Optional[float] = 50.0  # 0-100
+    genderInfluence: Optional[float] = 0.0  # Percentage impact of fairness adjustment
+    decisionFactors: Optional[Dict[str, float]] = None  # {experience, qualification, salary_fit, fairness_adjustment}
 
 
 class CandidatesResponse(BaseModel):

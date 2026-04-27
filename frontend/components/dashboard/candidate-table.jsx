@@ -59,6 +59,18 @@ export function CandidateTable() {
     }
   }
 
+  const formatGenderInfluence = (influence) => {
+    if (!influence && influence !== 0) return '0%'
+    return `${influence > 0 ? '+' : ''}${influence.toFixed(1)}%`
+  }
+
+  const getScoreColor = (score) => {
+    if (score >= 75) return 'text-emerald-500'
+    if (score >= 60) return 'text-blue-500'
+    if (score >= 45) return 'text-yellow-500'
+    return 'text-red-500'
+  }
+
   return (
     <>
       <motion.div
@@ -66,19 +78,25 @@ export function CandidateTable() {
         animate={{ opacity: 1, y: 0 }}
         className="p-6 rounded-xl border border-border bg-card"
       >
-        <h3 className="font-semibold mb-6">
-          Candidate Evaluation
-        </h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-semibold text-lg">
+            Candidate Evaluation
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            {candidates.length} candidates
+          </span>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left py-3 px-4">Candidate</th>
-                <th className="text-left py-3 px-4">Status</th>
-                <th className="text-left py-3 px-4">Confidence</th>
-                <th className="text-left py-3 px-4">Bias Influence</th>
-                <th className="text-left py-3 px-4">Action</th>
+                <th className="text-left py-3 px-4 font-semibold">Candidate</th>
+                <th className="text-left py-3 px-4 font-semibold">Score</th>
+                <th className="text-left py-3 px-4 font-semibold">Status</th>
+                <th className="text-left py-3 px-4 font-semibold">Confidence</th>
+                <th className="text-left py-3 px-4 font-semibold">Fairness</th>
+                <th className="text-center py-3 px-4 font-semibold">Details</th>
               </tr>
             </thead>
 
@@ -91,17 +109,23 @@ export function CandidateTable() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ delay: index * 0.04 }}
-                    className="border-b border-border hover:bg-muted/30"
+                    className="border-b border-border hover:bg-muted/30 transition-colors"
                   >
                     <td className="py-4 px-4">
                       <div>
-                        <p className="font-medium">
+                        <p className="font-medium text-foreground">
                           {candidate.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {candidate.id}
+                          ID: {candidate.id}
                         </p>
                       </div>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <span className={`font-semibold ${getScoreColor(candidate.score)}`}>
+                        {candidate.score?.toFixed(1) || 0}
+                      </span>
                     </td>
 
                     <td className="py-4 px-4">
@@ -110,37 +134,45 @@ export function CandidateTable() {
                           candidate.status
                         )}`}
                       >
-                        {candidate.status}
+                        {candidate.status || 'In Review'}
                       </span>
                     </td>
 
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-20 h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="w-16 h-2 rounded-full bg-muted overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-purple-500 to-emerald-500"
                             style={{
-                              width: `${candidate.confidence}%`,
+                              width: `${candidate.confidence || 0}%`,
                             }}
                           />
                         </div>
-
-                        <span className="text-purple-500 font-semibold">
-                          {candidate.confidence}%
+                        <span className="text-purple-500 font-semibold text-xs">
+                          {candidate.confidence?.toFixed(0) || 0}%
                         </span>
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 text-xs text-muted-foreground">
-                      {candidate.genderInfluence || 'Low'}
+                    <td className="py-4 px-4">
+                      <span className={`text-xs font-medium ${
+                        (candidate.genderInfluence || 0) > 0
+                          ? 'text-emerald-500'
+                          : (candidate.genderInfluence || 0) < 0
+                          ? 'text-yellow-500'
+                          : 'text-muted-foreground'
+                      }`}>
+                        {formatGenderInfluence(candidate.genderInfluence || 0)}
+                      </span>
                     </td>
 
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 text-center">
                       <button
                         onClick={() =>
                           setSelectedCandidate(candidate)
                         }
-                        className="p-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-500"
+                        className="p-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 transition-colors mx-auto block"
+                        title="View detailed breakdown"
                       >
                         <Info className="w-4 h-4" />
                       </button>
