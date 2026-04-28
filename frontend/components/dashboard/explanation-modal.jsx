@@ -231,9 +231,15 @@ export function ExplanationModal({ candidate, onClose }) {
                   </p>
                 </div>
                 <div className="p-3 rounded-lg bg-background/50 border border-border">
+                  <p className="text-xs text-muted-foreground mb-1">Caste</p>
+                  <p className="font-semibold text-foreground">
+                    {candidate.caste || 'General'}
+                  </p>
+                </div>
+                <div className="p-3 rounded-lg bg-background/50 border border-border">
                   <p className="text-xs text-muted-foreground mb-1">Salary Expectation</p>
                   <p className="font-semibold text-foreground">
-                    ${(candidate.salary_expectation || 0).toLocaleString()}
+                    ₹{candidate.salary_expectation || 0} LPA
                   </p>
                 </div>
               </div>

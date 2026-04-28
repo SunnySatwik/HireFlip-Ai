@@ -72,6 +72,7 @@ async def get_shortlist():
                     qualification=str(row.get('qualification', 'N/A')),
                     gender=str(row.get('gender', 'Not Specified')),
                     ethnicity=str(row.get('ethnicity', None)) if 'ethnicity' in row and pd.notna(row['ethnicity']) else None,
+                    caste=str(row.get('caste', None)) if 'caste' in row and pd.notna(row['caste']) else None,
                     salary_expectation=float(row.get('salary_expectation', 0)) if 'salary_expectation' in row else 0.0,
                     score=original_score,
                     fairnessAdjustedScore=adjusted_score,

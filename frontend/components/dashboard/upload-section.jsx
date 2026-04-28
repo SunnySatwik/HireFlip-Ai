@@ -3,8 +3,9 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 
-export function UploadSection() {
+export function UploadSection({ onUploadSuccess }) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadSuccess, setUploadSuccess] = useState(false)
@@ -43,9 +44,13 @@ export function UploadSection() {
       setUploadSuccess(true)
       setIsUploading(false)
 
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
+      toast.success('Candidates imported successfully!', {
+        description: `${data.rowCount} new profiles added to the pool.`,
+      })
+
+      if (onUploadSuccess) {
+        onUploadSuccess()
+      }
     } catch (err) {
       setError(err.message)
       setIsUploading(false)
@@ -152,6 +157,7 @@ export function UploadSection() {
             </p>
             <a
               href="/sample-template.csv"
+              download="sample-template.csv"
               className="text-sm text-purple-500 font-semibold"
             >
               Download Template

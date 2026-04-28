@@ -98,15 +98,16 @@ def generate_recommendations(metrics: dict, df) -> list:
             "Low bias risk: Selection process appears fair across demographic groups."
         )
 
-    # Group-specific recommendations
-    if 'gender' in df.columns:
-        gender_counts = df['gender'].value_counts()
-        if len(gender_counts) > 1:
-            max_group = gender_counts.max()
-            min_group = gender_counts.min()
-            if min_group / max_group < 0.3:
+    # Group-specific recommendations (Indian Market focus: Caste)
+    demographic_col = 'caste' if 'caste' in df.columns else ('gender' if 'gender' in df.columns else None)
+    if demographic_col:
+        counts = df[demographic_col].value_counts()
+        if len(counts) > 1:
+            max_group = counts.max()
+            min_group = counts.min()
+            if min_group / max_group < 0.2: # Stricter for caste categories
                 recommendations.append(
-                    "Significant imbalance in candidate demographics. Consider targeted outreach to underrepresented groups."
+                    f"Significant imbalance in {demographic_col} demographics. Consider targeted outreach to underrepresented categories (SC/ST/OBC/EWS)."
                 )
 
     return recommendations[:5]  # Return top 5 recommendations

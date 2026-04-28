@@ -7,7 +7,6 @@ import { useState } from 'react'
 
 const menuItems = [
   { icon: BarChart3, label: 'Overview', href: '#', active: true },
-  { icon: Zap, label: 'Audits', href: '#', active: false },
   { icon: Users, label: 'Candidates', href: '#', active: false },
   { icon: FileText, label: 'Reports', href: '#', active: false },
   { icon: Settings, label: 'Settings', href: '#', active: false },
@@ -60,23 +59,6 @@ export function Sidebar() {
           )
         })}
       </nav>
-
-      {/* Bottom section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="space-y-4 pt-4 border-t border-sidebar-border"
-      >
-        <button className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent/30 transition-colors text-sm font-medium">
-          <Settings className="w-5 h-5" />
-          Support
-        </button>
-        <button className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sidebar-foreground hover:text-red-400 transition-colors text-sm font-medium">
-          <LogOut className="w-5 h-5" />
-          Sign Out
-        </button>
-      </motion.div>
     </motion.aside>
   )
 }

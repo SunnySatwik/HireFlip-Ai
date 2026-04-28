@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.className} ${geistMono.className}`}>
         {children}
+        <Toaster position="top-right" richColors />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>

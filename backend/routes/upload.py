@@ -26,8 +26,8 @@ def apply_deterministic_scoring(df):
 
     Replaces random scoring with real multi-factor scoring based on:
     - Experience (50% weight)
-    - Qualification level (30% weight)
-    - Salary fit (20% weight)
+    - Qualification level (30% weight) - smarter, role-aware qualification scoring
+    - Salary fit (20% weight) - budget band based, ethical (does not reward cheap candidates)
     """
     if 'score' in df.columns:
         return df  # Use existing scores if present
@@ -35,11 +35,14 @@ def apply_deterministic_scoring(df):
     max_exp = df['experience'].max() if df['experience'].max() > 0 else 1
     max_salary = df['salary_expectation'].max() if 'salary_expectation' in df.columns else 100000
 
+    # Calculate median salary for ethical budget band calculation
+    median_salary = df['salary_expectation'].median() if 'salary_expectation' in df.columns and len(df) > 0 else None
+
     scores = []
     decision_factors_list = []
 
     for _, row in df.iterrows():
-        score, factors = calculate_deterministic_score(row, max_exp, max_salary)
+        score, factors = calculate_deterministic_score(row, max_exp, max_salary, median_salary)
         scores.append(score)
         decision_factors_list.append(factors)
 

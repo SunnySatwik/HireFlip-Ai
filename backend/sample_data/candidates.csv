@@ -1,21 +1,51 @@
-id,name,experience,qualification,gender,ethnicity,salary_expectation
-1,Alice Johnson,8,MS Computer Science,Female,Asian,120000
-2,Bob Smith,10,BS Engineering,Male,Caucasian,130000
-3,Carol Davis,5,BA Business,Female,African American,95000
-4,David Wilson,12,PhD Math,Male,Asian,140000
-5,Emma Martinez,6,MS Data Science,Female,Hispanic,110000
-6,Frank Chen,9,BS Computer Science,Male,Asian,125000
-7,Grace Lee,7,MS Statistics,Female,Asian,115000
-8,Henry Brown,11,MBA,Male,Caucasian,135000
-9,Iris Taylor,4,BS Psychology,Female,Caucasian,85000
-10,Jack Anderson,8,MS Engineering,Male,Caucasian,128000
-11,Karen White,6,BS Finance,Female,African American,100000
-12,Liam Garcia,9,MS Computer Science,Male,Hispanic,122000
-13,Michelle Jackson,5,BA Communications,Female,African American,88000
-14,Nathan Moore,10,MS Software Engineering,Male,Caucasian,132000
-15,Olivia Thomas,7,BS Information Technology,Female,Asian,112000
-16,Peter Jackson,8,MS Economics,Male,African American,118000
-17,Quinn Roberts,6,BA Marketing,Female,Caucasian,92000
-18,Robert Harris,11,PhD Engineering,Male,Caucasian,145000
-19,Sofia Kim,5,MS Chemistry,Female,Asian,108000
-20,Thomas Lopez,9,BS Accounting,Male,Hispanic,120000
+id,name,experience,qualification,gender,caste,salary_expectation
+1,Arjun Sharma,8,B.Tech CSE (IIT Delhi),Male,General,42
+2,Priya Patel,10,MS Data Science,Female,OBC,35
+3,Rahul Verma,5,BE Mechanical,Male,SC,12
+4,Ananya Iyer,12,PhD AI/ML (IISc),Female,General,55
+5,Siddharth Gupta,6,MBA (IIMB),Male,EWS,28
+6,Meera Nair,9,B.Tech (NIT Trichy),Female,OBC,24
+7,Vikram Singh,7,MS CS (BITS Pilani),Male,General,32
+8,Aditi Rao,11,M.Tech (IITB),Female,ST,18
+9,Karthik Reddy,4,BCA + Bootcamp,Male,OBC,9
+10,Sanjana Deshmukh,8,BE (Tier-3 College),Female,SC,15
+11,Amitabh Bachchan,20,MA Arts,Male,General,100
+12,Ishaan Khatter,3,B.Tech CSE,Male,General,15
+13,Sanya Malhotra,5,B.Tech IT,Female,OBC,14
+14,Rohan Mehra,10,MS Software Engineering,Male,EWS,38
+15,Kiara Advani,7,B.Com + Self-taught,Female,General,12
+16,Varun Dhawan,8,MS Economics,Male,OBC,22
+17,Alia Bhatt,6,BA Marketing,Female,General,18
+18,Ranbir Kapoor,11,PhD Physics,Male,General,65
+19,Shraddha Kapoor,5,MS Chemistry,Female,OBC,16
+20,Ayushmann Khurrana,9,Diploma Engineering,Male,SC,14
+21,Rajkummar Rao,12,B.Tech + PGDM,Male,OBC,30
+22,Bhumi Pednekar,4,B.Tech CSE,Female,ST,10
+23,Pankaj Tripathi,15,B.Sc + MCA,Male,OBC,25
+24,Vicky Kaushal,8,B.Tech Mechanical,Male,General,26
+25,Taapsee Pannu,7,B.Tech CSE (Tier-2),Female,EWS,20
+26,Nawazuddin Siddiqui,14,B.Sc + Self-taught,Male,SC,18
+27,Manoj Bajpayee,16,BA + Bootcamp,Male,ST,16
+28,Radhika Apte,9,MS Data Science,Female,General,32
+29,Jim Sarbh,6,MS AI,Male,General,28
+30,Sobhita Dhulipala,5,B.Tech (NIT),Female,OBC,18
+31,Vijay Varma,10,BE (Tier-3) + 12 yrs exp,Male,SC,20
+32,Jaideep Ahlawat,13,Diploma + 15 yrs exp,Male,OBC,22
+33: 33,Shefali Shah,12,M.Tech,Female,General,40
+34: 34,Rasika Dugal,8,MS CS,Female,EWS,26
+35: 35,Vikrant Massey,6,B.Tech IT,Male,OBC,15
+36,Zoya Akhtar,15,MBA (IIM),Female,General,60
+37,Farhan Akhtar,12,B.Tech (IIT),Male,General,50
+38,Konkona Sen Sharma,10,MS Statistics,Female,General,36
+39,Kay Kay Menon,18,M.Tech CSE,Male,General,45
+40,Richa Chadha,7,BE IT,Female,OBC,18
+41,Huma Qureshi,6,BCA + MCA,Female,SC,12
+42,Abhishek Banerjee,5,B.Tech (Tier-3),Male,ST,10
+43,Siddhant Chaturvedi,4,B.Com + CA + Coding,Male,EWS,22
+44,Tripti Dimri,3,B.Tech CSE,Female,OBC,14
+45,Babil Khan,2,B.Sc CS,Male,General,12
+46,Wamiqa Gabbi,5,B.Tech IT,Female,OBC,16
+47,Adarsh Gourav,6,B.Tech CSE (IIT),Male,General,35
+48,Shweta Tripathi,8,MS Data Science,Female,SC,22
+49,Ali Fazal,9,BE Mechanical,Male,OBC,24
+50,Pankaj Kapur,25,PhD CS,Male,General,80

@@ -1,0 +1,11 @@
+id,name,experience,qualification,gender,caste,salary_expectation
+1,Rahul Sharma,8,B.Tech CSE (IIT),Male,General,42
+2,Priya Patel,10,MS Data Science,Female,OBC,35
+3,Amit Verma,5,BE Mechanical,Male,SC,12
+4,Ananya Iyer,12,PhD AI/ML,Female,General,55
+5,Siddharth Gupta,6,MBA (IIM),Male,EWS,28
+6,Meera Nair,9,B.Tech (NIT),Female,OBC,24
+7,Vikram Singh,7,MS CS,Male,General,32
+8,Aditi Rao,11,M.Tech,Female,ST,18
+9,Karthik Reddy,4,BCA + Bootcamp,Male,OBC,9
+10,Sanjana Deshmukh,8,BE (Tier-3),Female,SC,15

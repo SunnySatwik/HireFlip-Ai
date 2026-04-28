@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Sidebar } from '../../components/dashboard/sidebar'
 import { TopNavbar } from '../../components/dashboard/top-navbar'
@@ -32,6 +33,12 @@ const itemVariants = {
 }
 
 export default function Dashboard() {
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const handleRefresh = useCallback(() => {
+    setRefreshKey(prev => prev + 1)
+  }, [])
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -56,19 +63,19 @@ export default function Dashboard() {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <MetricsCards />
+              <MetricsCards key={`metrics-${refreshKey}`} />
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <ChartsSection />
+              <ChartsSection key={`charts-${refreshKey}`} />
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <UploadSection />
+              <UploadSection onUploadSuccess={handleRefresh} />
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <CandidateTable />
+              <CandidateTable key={`table-${refreshKey}`} />
             </motion.div>
           </div>
         </motion.main>

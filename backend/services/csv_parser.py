@@ -72,7 +72,7 @@ def normalize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         df['experience'] = pd.to_numeric(df['experience'], errors='coerce').fillna(0)
 
     # Standardize text columns
-    text_columns = ['name', 'qualification', 'gender', 'ethnicity']
+    text_columns = ['name', 'qualification', 'gender', 'ethnicity', 'caste']
     for col in text_columns:
         if col in df.columns:
             df[col] = df[col].astype(str).str.strip()

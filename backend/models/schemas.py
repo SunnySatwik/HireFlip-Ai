@@ -21,6 +21,8 @@ class MetricsResponse(BaseModel):
     equalizedOdds: float  # 0-1
     biasRiskLevel: str  # "Low", "Medium", "High"
     lastUpdated: str
+    acceptanceTrend: Optional[List[Dict[str, Any]]] = None
+    demographicDistribution: Optional[List[Dict[str, Any]]] = None
 
 
 class Candidate(BaseModel):
@@ -31,6 +33,7 @@ class Candidate(BaseModel):
     qualification: str
     gender: str
     ethnicity: Optional[str]
+    caste: Optional[str]
     salary_expectation: float
     score: float
     fairnessAdjustedScore: float

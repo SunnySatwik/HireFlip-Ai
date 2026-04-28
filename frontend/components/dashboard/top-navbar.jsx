@@ -1,12 +1,11 @@
 'use client'
 import Link from "next/link";
 import { motion } from 'framer-motion'
-import { ChevronDown, Bell, Search } from 'lucide-react'
-import { currentUser, organizations } from '@/data/mock-data'
+import { ChevronDown, LogOut, User, Settings } from 'lucide-react'
+import { currentUser } from '@/data/mock-data'
 import { useState } from 'react'
 
 export function TopNavbar() {
-  const [isOrgMenuOpen, setIsOrgMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   return (
@@ -26,62 +25,13 @@ export function TopNavbar() {
 
         {/* Right section */}
         <div className="flex items-center gap-4">
-          {/* Search */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-background/50 border border-border hover:border-purple-500/30 transition-colors">
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search candidates..."
-              className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none w-32"
-            />
-          </div>
-        <Link href="/" className="px-3 py-2 rounded-lg border">
-          Home
-        </Link>
-          {/* Notification bell */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative p-2 rounded-lg hover:bg-background/50 transition-colors"
-          >
-            <Bell className="w-5 h-5 text-foreground" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-          </motion.button>
-
-          {/* Organization selector */}
-          <div className="relative">
-            <motion.button
-              onClick={() => setIsOrgMenuOpen(!isOrgMenuOpen)}
-              whileHover={{ scale: 1.02 }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-background/50 transition-colors text-sm font-medium text-foreground"
-            >
-              {organizations[0].name}
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            </motion.button>
-
-            {isOrgMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
-              >
-                {organizations.map((org) => (
-                  <button
-                    key={org.id}
-                    onClick={() => setIsOrgMenuOpen(false)}
-                    className="w-full text-left px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground"
-                  >
-                    {org.name}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </div>
+          <Link href="/" className="px-3 py-2 rounded-lg border border-border text-xs font-medium hover:bg-accent transition-colors">
+            Back to Site
+          </Link>
 
           {/* User profile */}
           <div className="relative flex items-center gap-3 pl-4 border-l border-border">
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-foreground">{currentUser.name}</p>
               <p className="text-xs text-muted-foreground">{currentUser.role}</p>
             </div>
@@ -102,17 +52,20 @@ export function TopNavbar() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute right-0 mt-48 w-40 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
+                className="absolute right-0 mt-48 w-48 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
               >
-                <button className="w-full text-left px-4 py-2 hover:bg-background/50 transition-colors text-sm text-foreground">
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground">
+                  <User className="w-4 h-4" />
                   Profile
                 </button>
-                <button className="w-full text-left px-4 py-2 hover:bg-background/50 transition-colors text-sm text-foreground">
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground">
+                  <Settings className="w-4 h-4" />
                   Settings
                 </button>
                 <div className="border-t border-border" />
-                <button className="w-full text-left px-4 py-2 hover:bg-red-500/10 transition-colors text-sm text-red-400">
-                  Sign Out
+                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-red-500/10 transition-colors text-sm text-red-400">
+                  <LogOut className="w-4 h-4" />
+                  Logout
                 </button>
               </motion.div>
             )}
