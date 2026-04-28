@@ -17,12 +17,12 @@ from routes import upload, metrics, candidates, shortlist, reports, auth, ai
 
 # Base.metadata.create_all(bind=engine) - Moved to startup event
 
+import os
+
 app = FastAPI(
     title="AI Hiring Fairness Auditor",
     version="1.0.0"
 )
-
-import os
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +31,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:3001"
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -108,14 +109,7 @@ async def root():
     )
 
 
-# Global error handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    """Handle uncaught exceptions."""
-    return JSONResponse(
-        status_code=500,
-        content={"error": "Internal server error", "detail": str(exc)}
-    )
+
 
 
 if __name__ == "__main__":
