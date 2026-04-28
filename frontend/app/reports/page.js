@@ -64,12 +64,12 @@ export default function ReportsPage() {
       .map(c => {
         const appliedStatus = getAppliedStatus(c.id, c.status)
         const decision = decisions[c.id]
-        
+
         if (appliedStatus !== 'Shortlisted') return null
 
         let label = 'Auto Selected'
         let date = 'Initial Audit'
-        
+
         if (decision) {
           date = new Date(decision.approvedAt).toLocaleDateString()
           if (c.status === 'In Review') {
@@ -80,7 +80,7 @@ export default function ReportsPage() {
             label = 'Decision Confirmed'
           }
         }
-        
+
         return {
           id: c.id,
           name: c.name,
@@ -152,14 +152,14 @@ export default function ReportsPage() {
     const manualImprovements = candidates.filter(c => {
       const applied = getAppliedStatus(c.id, c.status)
       // Improvement if moved to Shortlisted from anything else, or In Review from Rejected
-      return (applied === 'Shortlisted' && c.status !== 'Shortlisted') || 
-             (applied === 'In Review' && c.status === 'Rejected')
+      return (applied === 'Shortlisted' && c.status !== 'Shortlisted') ||
+        (applied === 'In Review' && c.status === 'Rejected')
     }).length;
 
     // Fairness simulation (consistent with MetricsCards)
     const baseFairness = metrics?.fairnessScore || 75
     const baseDP = metrics?.demographicParity || 0.65
-    
+
     const afterFairness = Math.min(100, baseFairness + (manualImprovements * 0.4))
     const afterDP = Math.min(1, baseDP + (manualImprovements * 0.01))
 
@@ -220,7 +220,7 @@ export default function ReportsPage() {
             <div ref={reportRef} className="max-w-[850px] mx-auto p-12 bg-background border border-border shadow-2xl space-y-10 report-container relative overflow-hidden">
               {/* Background Watermark/Pattern for Premium Feel */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-              
+
               {/* Professional Header */}
               <div className="flex justify-between items-start border-b border-border pb-8 relative">
                 <div>
@@ -253,10 +253,10 @@ export default function ReportsPage() {
                     <div className="text-4xl font-black text-primary">{(stats?.fairness.after || 0).toFixed(0)}<span className="text-xl">%</span></div>
                   </div>
                   <div className="mt-4 h-1.5 bg-background rounded-full overflow-hidden">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${stats?.fairness.after}%` }}
-                      className="h-full bg-primary" 
+                      className="h-full bg-primary"
                     />
                   </div>
                   <p className="text-[9px] text-muted-foreground mt-2 font-medium italic text-center">High Statistical Reliability</p>
@@ -305,18 +305,18 @@ export default function ReportsPage() {
                     <div className="space-y-4">
                       <h3 className="text-xs font-black text-primary uppercase tracking-widest">Fairness Interpretation</h3>
                       <p className="text-xs leading-relaxed text-foreground/80">
-                        The current recruitment cycle demonstrates a <span className="font-bold text-primary">robust integrity profile</span>. 
-                        Initial algorithmic suggestions were strategically augmented by auditor oversight, resulting in a 
-                        <span className="font-bold text-emerald-500"> +{stats?.fairness.improvement.toFixed(1)}pt improvement</span> in selection neutrality. 
+                        The current recruitment cycle demonstrates a <span className="font-bold text-primary">robust integrity profile</span>.
+                        Initial algorithmic suggestions were strategically augmented by auditor oversight, resulting in a
+                        <span className="font-bold text-emerald-500"> +{stats?.fairness.improvement.toFixed(1)}pt improvement</span> in selection neutrality.
                         Demographic parity has been successfully stabilized at institutional benchmarks.
                       </p>
                     </div>
                     <div className="space-y-4">
                       <h3 className="text-xs font-black text-primary uppercase tracking-widest">Candidate Funnel Insights</h3>
                       <p className="text-xs leading-relaxed text-foreground/80">
-                        Throughput from initial pool to final shortlist maintains a <span className="font-bold text-primary">balanced distribution profile</span>. 
-                        Manual interventions focused on promoting high-potential candidates who initially triggered 
-                        variance flags, ensuring that the final selection represents the most equitable cross-section 
+                        Throughput from initial pool to final shortlist maintains a <span className="font-bold text-primary">balanced distribution profile</span>.
+                        Manual interventions focused on promoting high-potential candidates who initially triggered
+                        variance flags, ensuring that the final selection represents the most equitable cross-section
                         of the talent pool.
                       </p>
                     </div>
@@ -343,10 +343,10 @@ export default function ReportsPage() {
                           <span>{m.value.toFixed(1)}%</span>
                         </div>
                         <div className="h-1 bg-muted rounded-full overflow-hidden">
-                          <motion.div 
+                          <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${m.value}%` }}
-                            className={`h-full ${m.color}`} 
+                            className={`h-full ${m.color}`}
                           />
                         </div>
                       </div>
@@ -390,8 +390,8 @@ export default function ReportsPage() {
                       <span className="text-[10px] font-black uppercase tracking-widest text-foreground">Anonymization</span>
                     </div>
                     <p className="text-[10px] text-muted-foreground leading-relaxed">
-                      {candidates.some(c => c.name.startsWith('Candidate #')) 
-                        ? 'Resume anonymization applied before evaluation. PII data never processed by core AI.' 
+                      {candidates.some(c => c.name.startsWith('Candidate #'))
+                        ? 'Resume anonymization applied before evaluation. PII data never processed by core AI.'
                         : 'Standard processing applied. Anonymization was disabled for this dataset.'}
                     </p>
                   </div>
@@ -426,9 +426,9 @@ export default function ReportsPage() {
               <div className="p-6 border-y border-border bg-muted/5">
                 <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3">Governance & Audit Methodology</h3>
                 <p className="text-[10px] leading-relaxed text-muted-foreground/80 italic">
-                  This report was generated using the HireFlip Selection Integrity Engine (v2.4). All AI-driven recommendations are 
-                  subject to Human-in-the-Loop validation protocols. Statistical fairness is calculated via independent demographic 
-                  parity and equalized odds analysis across intersectional identity vectors. Audit records are immutable and 
+                  This report was generated using the HireFlip Selection Integrity Engine (v2.4). All AI-driven recommendations are
+                  subject to Human-in-the-Loop validation protocols. Statistical fairness is calculated via independent demographic
+                  parity and equalized odds analysis across intersectional identity vectors. Audit records are immutable and
                   stored in compliance with institutional recruitment governance standards.
                 </p>
               </div>
@@ -448,8 +448,7 @@ export default function ReportsPage() {
                     implementationHistory.slice(0, 10).map((item) => (
                       <div key={item.id} className="py-4 flex items-center justify-between group hover:bg-muted/5 transition-colors px-2 rounded-lg">
                         <div className="flex items-center gap-4">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              item.isManual ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${item.isManual ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
                             }`}>
                             {item.isManual ? <Award className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                           </div>

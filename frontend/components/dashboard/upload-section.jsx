@@ -23,7 +23,7 @@ export function UploadSection({ onUploadSuccess }) {
       setError('Please upload a valid CSV file.')
       return
     }
-    
+
     setError('')
     setSelectedFile(file)
 
@@ -41,10 +41,10 @@ export function UploadSection({ onUploadSuccess }) {
           setError('The CSV file appears to be empty.')
           return
         }
-        
+
         const originalData = results.data.slice(0, 3) // Preview first 3 rows
         const anonymizedData = originalData.map((row, idx) => anonymizeRow(row, idx + 1))
-        
+
         setPreview({
           original: originalData,
           anonymized: anonymizedData,
@@ -63,7 +63,7 @@ export function UploadSection({ onUploadSuccess }) {
     const newRow = { ...row }
     // Detect common columns such as: name, full_name, email, phone, gender, college, university, address
     const sensitiveKeys = ['name', 'full_name', 'email', 'phone', 'gender', 'college', 'university', 'address']
-    
+
     Object.keys(newRow).forEach(key => {
       const lowerKey = key.toLowerCase()
       if (sensitiveKeys.some(sk => lowerKey.includes(sk))) {
@@ -81,12 +81,12 @@ export function UploadSection({ onUploadSuccess }) {
 
   const handleConfirmUpload = () => {
     if (!preview) return
-    
+
     const anonymizedFullData = preview.fullData.map((row, idx) => anonymizeRow(row, idx + 1))
     const csvString = Papa.unparse(anonymizedFullData)
     const blob = new Blob([csvString], { type: 'text/csv' })
     const anonymizedFile = new File([blob], selectedFile.name, { type: 'text/csv' })
-    
+
     uploadFile(anonymizedFile)
   }
 
@@ -146,7 +146,7 @@ export function UploadSection({ onUploadSuccess }) {
             <h3 className="font-bold text-xl tracking-tight">Dataset Importer</h3>
             <p className="text-xs text-muted-foreground mt-1 font-medium">Upload CSV to refresh fairness audit metrics</p>
           </div>
-          
+
           <div className="flex items-center gap-4 p-1 px-1 rounded-2xl bg-muted/50 border border-border">
             <div className={`flex items-center gap-2.5 p-2 px-4 rounded-xl transition-all ${anonymize ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'text-muted-foreground'}`}>
               <Shield className={`w-4 h-4 ${anonymize ? 'text-white' : 'text-purple-500'}`} />
@@ -156,11 +156,11 @@ export function UploadSection({ onUploadSuccess }) {
                   {anonymize ? 'Enabled (Secure)' : 'Disabled'}
                 </span>
               </div>
-              <button 
+              <button
                 onClick={() => setAnonymize(!anonymize)}
                 className={`ml-2 w-8 h-4 rounded-full relative transition-colors ${anonymize ? 'bg-purple-400' : 'bg-muted-foreground/30'}`}
               >
-                <motion.div 
+                <motion.div
                   animate={{ x: anonymize ? 16 : 2 }}
                   className="absolute top-1 w-2 h-2 bg-white rounded-full shadow-sm"
                 />
@@ -200,7 +200,7 @@ export function UploadSection({ onUploadSuccess }) {
                 onChange={(e) => processFile(e.target.files[0])}
               />
             </div>
-            
+
             {anonymize && (
               <div className="flex gap-3 p-4 rounded-2xl bg-purple-500/5 border border-purple-500/10 items-start">
                 <Info className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
@@ -215,7 +215,7 @@ export function UploadSection({ onUploadSuccess }) {
         {/* Anonymization Preview Stage */}
         <AnimatePresence>
           {preview && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -236,7 +236,7 @@ export function UploadSection({ onUploadSuccess }) {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-1">
@@ -246,13 +246,13 @@ export function UploadSection({ onUploadSuccess }) {
                     <div className="p-4 rounded-xl bg-background border border-border text-[9px] font-mono space-y-3 opacity-40 select-none pointer-events-none">
                       {preview.original.map((row, i) => (
                         <div key={i} className="flex gap-2 items-center">
-                          <span className="text-[8px] text-muted-foreground/50">{i+1}</span>
+                          <span className="text-[8px] text-muted-foreground/50">{i + 1}</span>
                           <span className="truncate">{Object.values(row).slice(0, 4).join(', ')}...</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-1">
                       <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Anonymized Output</p>
@@ -261,7 +261,7 @@ export function UploadSection({ onUploadSuccess }) {
                     <div className="p-4 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/20 text-[9px] font-mono space-y-3 text-emerald-700 shadow-inner">
                       {preview.anonymized.map((row, i) => (
                         <div key={i} className="flex gap-2 items-center">
-                          <span className="text-[8px] text-emerald-500/30">{i+1}</span>
+                          <span className="text-[8px] text-emerald-500/30">{i + 1}</span>
                           <span className="truncate font-bold">{Object.values(row).slice(0, 4).join(', ')}...</span>
                         </div>
                       ))}
@@ -313,7 +313,7 @@ export function UploadSection({ onUploadSuccess }) {
           <div className="space-y-6 py-8">
             <div className="flex flex-col items-center justify-center text-center space-y-4">
               <div className="relative">
-                <motion.div 
+                <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   className="w-16 h-16 rounded-full border-4 border-purple-500/10 border-t-purple-500"
@@ -325,7 +325,7 @@ export function UploadSection({ onUploadSuccess }) {
                 <p className="text-xs text-muted-foreground mt-1">Normalizing features and applying privacy constraints...</p>
               </div>
             </div>
-            
+
             <div className="space-y-2 max-w-sm mx-auto">
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-purple-500/70">
                 <span>Data Integrity Check</span>
@@ -345,13 +345,13 @@ export function UploadSection({ onUploadSuccess }) {
         {/* Success Stage */}
         <AnimatePresence>
           {uploadSuccess && (
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="flex flex-col items-center justify-center py-10 text-center"
             >
               <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 relative">
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute inset-0 rounded-full bg-emerald-500/5 animate-ping"
@@ -362,15 +362,15 @@ export function UploadSection({ onUploadSuccess }) {
               <p className="text-sm text-muted-foreground mt-2 max-w-[280px]">
                 {rowCount} profiles successfully ingested into your secure workspace.
               </p>
-              
+
               <div className="mt-8 flex flex-col gap-3 w-full max-w-[200px]">
-                <button 
+                <button
                   onClick={() => { setUploadSuccess(false); setPreview(null); if (onUploadSuccess) onUploadSuccess() }}
                   className="w-full py-3 rounded-xl bg-foreground text-background font-bold text-sm hover:opacity-90 transition-opacity"
                 >
                   View Live Dashboard
                 </button>
-                <button 
+                <button
                   onClick={() => { setUploadSuccess(false); setPreview(null) }}
                   className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-purple-500 transition-colors"
                 >
@@ -383,7 +383,7 @@ export function UploadSection({ onUploadSuccess }) {
 
         {/* Error Feedback */}
         {error && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-6 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/10 flex gap-4 items-center text-rose-500"

@@ -7,7 +7,7 @@ export function ExplanationModal({ candidate, onClose, showAcceptButton = true, 
   const [aiExplanation, setAiExplanation] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [errorStatus, setErrorStatus] = useState(null)
-  
+
   // Track last requested ID to prevent duplicate calls on re-renders
   const [lastRequestedId, setLastRequestedId] = useState(null)
 
@@ -24,7 +24,7 @@ export function ExplanationModal({ candidate, onClose, showAcceptButton = true, 
     // 1. Check local cache first (scoped by userId)
     const userId = localStorage.getItem('hireflip_user_id')
     const cacheKey = `hf_ai_exp_${candidate.id}${userId ? `_${userId}` : ''}`
-    
+
     const cached = localStorage.getItem(cacheKey)
     if (cached) {
       setAiExplanation(cached)

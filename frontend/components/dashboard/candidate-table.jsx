@@ -37,13 +37,13 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
         if (res.ok) {
           const data = await res.json()
           const rawCandidates = Array.isArray(data) ? data : data.candidates || []
-          
+
           // Apply stored decisions to loaded candidates
           const candidatesWithDecisions = rawCandidates.map(c => ({
             ...c,
             status: getAppliedStatus(c.id, c.status)
           }))
-          
+
           setCandidates(candidatesWithDecisions)
         }
       } catch (error) {
@@ -171,20 +171,20 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
 
   const handleApproveRecommendation = (candidateId, currentStatus) => {
     let nextStatus = currentStatus
-    
+
     if (currentStatus === 'In Review') {
       nextStatus = 'Shortlisted'
     } else if (currentStatus === 'Rejected') {
       nextStatus = 'In Review'
     } else {
       // Already Shortlisted or unknown, do nothing as requested
-      return 
+      return
     }
 
     approveRecommendation(candidateId, nextStatus)
 
     // Update local state to reflect the change immediately
-    setCandidates(prev => prev.map(c => 
+    setCandidates(prev => prev.map(c =>
       c.id === candidateId ? { ...c, status: nextStatus } : c
     ))
 
@@ -270,11 +270,10 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
                   setStatusFilter(status)
                   setCurrentPage(1)
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  statusFilter === status
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${statusFilter === status
                     ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
                     : 'bg-background/50 border border-border hover:border-purple-500/50 text-muted-foreground'
-                }`}
+                  }`}
               >
                 {status === 'all' ? 'All' : status}
               </motion.button>
@@ -398,13 +397,12 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-1">
                           <span
-                            className={`text-xs font-bold px-2 py-1 rounded ${
-                              (candidate.genderInfluence || 0) > 0
+                            className={`text-xs font-bold px-2 py-1 rounded ${(candidate.genderInfluence || 0) > 0
                                 ? 'bg-emerald-500/20 text-emerald-500'
                                 : (candidate.genderInfluence || 0) < 0
-                                ? 'bg-yellow-500/20 text-yellow-500'
-                                : 'bg-muted text-muted-foreground'
-                            }`}
+                                  ? 'bg-yellow-500/20 text-yellow-500'
+                                  : 'bg-muted text-muted-foreground'
+                              }`}
                           >
                             {formatGenderInfluence(candidate.genderInfluence || 0)}
                           </span>

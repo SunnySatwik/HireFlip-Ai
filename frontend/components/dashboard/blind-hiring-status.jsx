@@ -14,7 +14,7 @@ export function BlindHiringStatus() {
         const token = localStorage.getItem('hireflip_token')
         const headers = { 'Authorization': `Bearer ${token}` }
         const res = await fetch('http://localhost:8000/candidates', { headers })
-        
+
         if (res.ok) {
           const data = await res.json()
           setCandidates(Array.isArray(data) ? data : data.candidates || [])
@@ -41,22 +41,19 @@ export function BlindHiringStatus() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative overflow-hidden p-6 rounded-2xl border transition-all ${
-        isBlindActive 
-          ? 'bg-emerald-500/[0.03] border-emerald-500/20 shadow-lg shadow-emerald-500/5' 
-          : 'bg-muted/30 border-border'
-      }`}
+      className={`relative overflow-hidden p-6 rounded-2xl border transition-all ${isBlindActive
+        ? 'bg-emerald-500/[0.03] border-emerald-500/20 shadow-lg shadow-emerald-500/5'
+        : 'bg-muted/30 border-border'
+        }`}
     >
       {/* Decorative background element */}
-      <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full blur-3xl opacity-20 ${
-        isBlindActive ? 'bg-emerald-500' : 'bg-purple-500'
-      }`} />
+      <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full blur-3xl opacity-20 ${isBlindActive ? 'bg-emerald-500' : 'bg-purple-500'
+        }`} />
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
         <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${
-            isBlindActive ? 'bg-emerald-500/10' : 'bg-muted'
-          }`}>
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${isBlindActive ? 'bg-emerald-500/10' : 'bg-muted'
+            }`}>
             {isBlindActive ? (
               <ShieldCheck className="w-6 h-6 text-emerald-500" />
             ) : (
@@ -66,17 +63,16 @@ export function BlindHiringStatus() {
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-lg">Blind Hiring Mode</h3>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                isBlindActive 
-                  ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                  : 'bg-muted text-muted-foreground border border-border'
-              }`}>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isBlindActive
+                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                : 'bg-muted text-muted-foreground border border-border'
+                }`}>
                 {isBlindActive ? 'Active' : 'Inactive'}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1 font-medium italic">
-              {isBlindActive 
-                ? 'Your current dataset is protected by the Resume Anonymizer.' 
+              {isBlindActive
+                ? 'Your current dataset is protected by the Resume Anonymizer.'
                 : 'Enable anonymization during upload to remove identifying markers.'}
             </p>
           </div>
