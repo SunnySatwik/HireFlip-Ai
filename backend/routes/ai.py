@@ -59,7 +59,7 @@ async def explain_candidate(
         return ExplanationResponse(explanation=generate_local_fallback(req))
 
     try:
-        model = genai.GenerativeModel('gemini-pro')
+        model = genai.GenerativeModel("models/gemini-2.5-flash")
         
         prompt = f"""
         You are a professional HR AI assistant for HireFlip, a platform focused on fair and explainable hiring.
