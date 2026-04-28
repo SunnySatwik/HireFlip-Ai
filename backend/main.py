@@ -37,8 +37,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """
-    Load default dataset when server starts.
-    This ensures the dashboard has data immediately without requiring CSV upload.
+    Initialize system on startup.
     """
     print("[INFO] Starting AI Hiring Fairness Auditor Backend...")
     
@@ -51,9 +50,7 @@ async def startup_event():
         print(f"[ERROR] Error initializing database: {str(e)}")
         print("[WARN] Application will continue, but database-dependent features may fail.")
 
-    print("[INFO] Attempting to load default dataset from sample_data/candidates.csv...")
-    upload.load_default_dataset()
-    print("[SUCCESS] Backend ready!")
+    print("[SUCCESS] Backend ready with per-user isolation!")
 
 
 # Register route routers

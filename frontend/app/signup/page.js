@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Zap, Mail, Lock, Building, ArrowRight } from 'lucide-react'
+import { Zap, Mail, Lock, Building, ArrowRight, ChevronLeft } from 'lucide-react'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -48,8 +48,16 @@ export default function SignupPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative"
       >
+        <Link 
+          href="/" 
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm text-muted-foreground hover:text-purple-400 transition-colors group"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </Link>
+
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">

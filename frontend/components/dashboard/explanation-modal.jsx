@@ -21,8 +21,10 @@ export function ExplanationModal({ candidate, onClose, showAcceptButton = true, 
   const generateAiExplanation = async () => {
     if (!candidate) return
 
-    // 1. Check local cache first
-    const cacheKey = `hf_ai_exp_${candidate.id}`
+    // 1. Check local cache first (scoped by userId)
+    const userId = localStorage.getItem('hireflip_user_id')
+    const cacheKey = `hf_ai_exp_${candidate.id}${userId ? `_${userId}` : ''}`
+    
     const cached = localStorage.getItem(cacheKey)
     if (cached) {
       setAiExplanation(cached)
@@ -61,7 +63,7 @@ export function ExplanationModal({ candidate, onClose, showAcceptButton = true, 
       if (res.ok) {
         const data = await res.json()
         setAiExplanation(data.explanation)
-        // 2. Persist to cache
+        // 2. Persist to cache (scoped)
         localStorage.setItem(cacheKey, data.explanation)
       } else {
         throw new Error('AI generation failed')

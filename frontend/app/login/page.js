@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Zap, Mail, Lock, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Zap, Mail, Lock, ArrowRight, CheckCircle2, ChevronLeft } from 'lucide-react'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -33,6 +33,8 @@ export default function LoginPage() {
 
       if (res.ok) {
         localStorage.setItem('hireflip_token', data.access_token)
+        localStorage.setItem('hireflip_user_id', data.user_id)
+        localStorage.setItem('hireflip_email', data.email)
         router.push('/dashboard')
       } else {
         setError(data.detail || 'Invalid email or password')
@@ -49,8 +51,16 @@ export default function LoginPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative"
       >
+        <Link 
+          href="/" 
+          className="absolute -top-12 left-0 flex items-center gap-2 text-sm text-muted-foreground hover:text-purple-400 transition-colors group"
+        >
+          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Home
+        </Link>
+
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
             <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">

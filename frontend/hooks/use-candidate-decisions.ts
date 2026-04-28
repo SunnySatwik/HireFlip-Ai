@@ -6,14 +6,22 @@ interface CandidateDecision {
   approvedAt: number
 }
 
-const STORAGE_KEY = 'candidate_decisions'
+const BASE_STORAGE_KEY = 'candidate_decisions'
 
 export function useCandidateDecisions() {
+  const getScopedKey = useCallback(() => {
+    if (typeof window === 'undefined') return BASE_STORAGE_KEY
+    const userId = localStorage.getItem('hireflip_user_id')
+    return userId ? `${BASE_STORAGE_KEY}_${userId}` : BASE_STORAGE_KEY
+  }, [])
+
   const [decisions, setDecisions] = useState<Record<string, CandidateDecision>>(() => {
     if (typeof window === 'undefined') return {}
 
     try {
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const userId = localStorage.getItem('hireflip_user_id')
+      const scopedKey = userId ? `${BASE_STORAGE_KEY}_${userId}` : BASE_STORAGE_KEY
+      const stored = localStorage.getItem(scopedKey)
       if (!stored) return {}
       
       const parsed = JSON.parse(stored)
@@ -44,7 +52,8 @@ export function useCandidateDecisions() {
 
     const handleUpdate = () => {
       try {
-        const stored = localStorage.getItem(STORAGE_KEY)
+        const scopedKey = getScopedKey()
+        const stored = localStorage.getItem(scopedKey)
         setDecisions(stored ? JSON.parse(stored) : {})
       } catch (e) {
         console.error('Failed to sync decisions', e)
@@ -53,14 +62,14 @@ export function useCandidateDecisions() {
 
     window.addEventListener('candidate-decision-updated', handleUpdate)
     window.addEventListener('storage', (e) => {
-      if (e.key === STORAGE_KEY) handleUpdate()
+      if (e.key === getScopedKey()) handleUpdate()
     })
 
     return () => {
       window.removeEventListener('candidate-decision-updated', handleUpdate)
       window.removeEventListener('storage', handleUpdate)
     }
-  }, [])
+  }, [getScopedKey])
 
   const getDecision = useCallback((candidateId: string) => {
     return decisions[candidateId]
@@ -79,10 +88,12 @@ export function useCandidateDecisions() {
       approvedAt: Date.now(),
     }
 
+    const scopedKey = getScopedKey()
+    
     // Get fresh data from localStorage to avoid race conditions with other instances
     let currentDecisions = {}
     try {
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = localStorage.getItem(scopedKey)
       currentDecisions = stored ? JSON.parse(stored) : {}
     } catch (e) {
       console.error('Failed to read decisions during update', e)
@@ -93,7 +104,7 @@ export function useCandidateDecisions() {
       [candidateId]: decision,
     }
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    localStorage.setItem(scopedKey, JSON.stringify(updated))
     setDecisions(updated)
 
     // Trigger a custom event to notify other instances in this tab
@@ -102,14 +113,15 @@ export function useCandidateDecisions() {
         detail: { candidateId, status },
       })
     )
-  }, [])
+  }, [getScopedKey])
 
   const removeDecision = useCallback((candidateId: string) => {
     if (typeof window === 'undefined') return
 
+    const scopedKey = getScopedKey()
     let currentDecisions = {}
     try {
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = localStorage.getItem(scopedKey)
       currentDecisions = stored ? JSON.parse(stored) : {}
     } catch (e) {
       console.error('Failed to read decisions during remove', e)
@@ -118,11 +130,11 @@ export function useCandidateDecisions() {
     const updated = { ...currentDecisions }
     delete updated[candidateId]
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+    localStorage.setItem(scopedKey, JSON.stringify(updated))
     setDecisions(updated)
     
     window.dispatchEvent(new CustomEvent('candidate-decision-updated'))
-  }, [])
+  }, [getScopedKey])
 
   const getAppliedStatus = useCallback((candidateId: string, originalStatus: string) => {
     const decision = decisions[candidateId]

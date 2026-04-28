@@ -110,13 +110,14 @@ def get_current_dataset(
     """
     Dependency to get the latest processed dataset for the current user.
     """
-    # Check cache first
+    # 1. Check in-memory cache first
     if current_user.id in _dataframe_cache:
         return _dataframe_cache[current_user.id]
 
-    # Load latest from DB
+    # 2. Load latest from DB for this specific user
     dataset = db.query(Dataset).filter(Dataset.user_id == current_user.id).order_by(Dataset.uploaded_at.desc()).first()
     
+    # 3. If no dataset, raise 404 to prompt upload on frontend
     if not dataset:
         raise HTTPException(
             status_code=404,
@@ -125,12 +126,15 @@ def get_current_dataset(
 
     content = dataset.content
 
-    # Parse and process
-    df, _ = parse_csv_file(content)
-    df = normalize_dataframe(df)
-    df = apply_deterministic_scoring(df)
-    
-    # Cache for session
-    _dataframe_cache[current_user.id] = df
-    
-    return df
+    # 4. Parse and process
+    try:
+        df, _ = parse_csv_file(content)
+        df = normalize_dataframe(df)
+        df = apply_deterministic_scoring(df)
+        
+        # 5. Cache for session
+        _dataframe_cache[current_user.id] = df
+        return df
+    except Exception as e:
+        print(f"[ERROR] Dataset corruption for User {current_user.id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error processing your dataset.")

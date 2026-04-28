@@ -6,18 +6,31 @@ interface CandidateNote {
   updatedAt: number
 }
 
-const STORAGE_PREFIX = 'candidate_notes_'
+const BASE_STORAGE_PREFIX = 'candidate_notes_'
 
 export function useCandidateNotes() {
+  const getUserId = useCallback(() => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem('hireflip_user_id')
+  }, [])
+
+  const getScopedPrefix = useCallback(() => {
+    const userId = getUserId()
+    return userId ? `${BASE_STORAGE_PREFIX}${userId}_` : BASE_STORAGE_PREFIX
+  }, [getUserId])
+
   const [notes, setNotes] = useState<Record<string, CandidateNote>>(() => {
     if (typeof window === 'undefined') return {}
 
     const stored: Record<string, CandidateNote> = {}
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('hireflip_user_id') : null
+    const scopedPrefix = userId ? `${BASE_STORAGE_PREFIX}${userId}_` : BASE_STORAGE_PREFIX
+    
     const keys = Object.keys(localStorage)
 
     keys.forEach(key => {
-      if (key.startsWith(STORAGE_PREFIX)) {
-        const candidateId = key.replace(STORAGE_PREFIX, '')
+      if (key.startsWith(scopedPrefix)) {
+        const candidateId = key.replace(scopedPrefix, '')
         try {
           stored[candidateId] = JSON.parse(localStorage.getItem(key) || '{}')
         } catch (e) {
@@ -49,8 +62,9 @@ export function useCandidateNotes() {
       updatedAt: now,
     }
 
+    const scopedPrefix = getScopedPrefix()
     localStorage.setItem(
-      `${STORAGE_PREFIX}${candidateId}`,
+      `${scopedPrefix}${candidateId}`,
       JSON.stringify(newNote)
     )
 
@@ -58,19 +72,20 @@ export function useCandidateNotes() {
       ...prev,
       [candidateId]: newNote,
     }))
-  }, [notes])
+  }, [notes, getScopedPrefix])
 
   const deleteNote = useCallback((candidateId: string) => {
     if (typeof window === 'undefined') return
 
-    localStorage.removeItem(`${STORAGE_PREFIX}${candidateId}`)
+    const scopedPrefix = getScopedPrefix()
+    localStorage.removeItem(`${scopedPrefix}${candidateId}`)
 
     setNotes(prev => {
       const updated = { ...prev }
       delete updated[candidateId]
       return updated
     })
-  }, [])
+  }, [getScopedPrefix])
 
   return {
     notes,

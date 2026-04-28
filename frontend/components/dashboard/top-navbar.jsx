@@ -39,8 +39,32 @@ export function TopNavbar() {
   }, [])
 
   const handleLogout = () => {
+    const userId = localStorage.getItem('hireflip_user_id')
+    
+    if (userId) {
+      // Clear user-scoped workspace state
+      const keysToRemove = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (
+          key && (
+            key.endsWith(`_${userId}`) || 
+            key.startsWith(`candidate_notes_${userId}_`) ||
+            key === `candidate_decisions_${userId}`
+          )
+        ) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k))
+    }
+
+    // Clear session keys
     localStorage.removeItem('hireflip_token')
     localStorage.removeItem('hireflip_user')
+    localStorage.removeItem('hireflip_user_id')
+    localStorage.removeItem('hireflip_email')
+    
     router.push('/login')
   }
 
