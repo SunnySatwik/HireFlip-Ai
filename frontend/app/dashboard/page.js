@@ -8,6 +8,7 @@ import { MetricsCards } from '../../components/dashboard/metrics-cards'
 import { ChartsSection } from '../../components/dashboard/charts-section'
 import { CandidateTable } from '../../components/dashboard/candidate-table'
 import { UploadSection } from '../../components/dashboard/upload-section'
+import { BlindHiringStatus } from '../../components/dashboard/blind-hiring-status'
 import { AuthGuard } from '../../components/auth-guard'
 import { FileUp, Search } from 'lucide-react'
 
@@ -123,6 +124,10 @@ export default function Dashboard() {
 
                   <motion.div variants={itemVariants}>
                     <ChartsSection key={`charts-${refreshKey}`} />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants}>
+                    <BlindHiringStatus key={`blind-${refreshKey}`} />
                   </motion.div>
 
                   <motion.div variants={itemVariants}>
