@@ -24,7 +24,7 @@ export function TopNavbar() {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('hireflip_token')
-        const res = await fetch('http://localhost:8000/auth/me', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         if (res.ok) {

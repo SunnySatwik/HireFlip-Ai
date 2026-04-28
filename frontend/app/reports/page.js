@@ -106,9 +106,9 @@ export default function ReportsPage() {
         const headers = { 'Authorization': `Bearer ${token}` }
 
         const [candRes, metrRes, userRes] = await Promise.all([
-          fetch('http://localhost:8000/candidates', { headers }),
-          fetch('http://localhost:8000/metrics', { headers }),
-          fetch('http://localhost:8000/auth/me', { headers })
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/candidates`, { headers }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/metrics`, { headers }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/me`, { headers })
         ])
 
         if (candRes.ok && metrRes.ok) {

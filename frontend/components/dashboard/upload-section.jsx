@@ -104,7 +104,7 @@ export function UploadSection({ onUploadSuccess }) {
       setUploadProgress(30)
       const token = localStorage.getItem('hireflip_token')
 
-      const response = await fetch('http://localhost:8000/upload-csv', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/upload-csv`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

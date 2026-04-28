@@ -34,7 +34,7 @@ export default function SettingsPage() {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('hireflip_token')
-      const res = await fetch('http://localhost:8000/auth/me', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       if (res.ok) {
@@ -59,7 +59,7 @@ export default function SettingsPage() {
     setSaving(true)
     try {
       const token = localStorage.getItem('hireflip_token')
-      const res = await fetch('http://localhost:8000/auth/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function SettingsPage() {
     setPassSaving(true)
     try {
       const token = localStorage.getItem('hireflip_token')
-      const res = await fetch('http://localhost:8000/auth/password', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

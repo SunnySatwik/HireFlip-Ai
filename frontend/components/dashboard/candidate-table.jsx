@@ -29,7 +29,7 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
     const loadCandidates = async () => {
       try {
         const token = localStorage.getItem('hireflip_token')
-        const res = await fetch('http://localhost:8000/candidates', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/candidates`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

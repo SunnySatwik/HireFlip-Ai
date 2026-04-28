@@ -39,7 +39,7 @@ export function ExplanationModal({ candidate, onClose, showAcceptButton = true, 
 
     try {
       const token = localStorage.getItem('hireflip_token')
-      const res = await fetch('http://localhost:8000/ai/explain-candidate', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/ai/explain-candidate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

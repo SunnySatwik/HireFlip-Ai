@@ -13,7 +13,7 @@ export function BlindHiringStatus() {
       try {
         const token = localStorage.getItem('hireflip_token')
         const headers = { 'Authorization': `Bearer ${token}` }
-        const res = await fetch('http://localhost:8000/candidates', { headers })
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/candidates`, { headers })
 
         if (res.ok) {
           const data = await res.json()

@@ -51,8 +51,8 @@ export default function Dashboard() {
       const headers = { 'Authorization': `Bearer ${token}` }
       
       const [metRes, candRes] = await Promise.all([
-        fetch('http://localhost:8000/metrics', { headers }),
-        fetch('http://localhost:8000/candidates', { headers })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/metrics`, { headers }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/candidates`, { headers })
       ])
       
       if (metRes.status === 404) {
@@ -198,4 +198,4 @@ export default function Dashboard() {
       </div>
     </AuthGuard>
   )
-}
+}

@@ -22,10 +22,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS for Next.js frontend on localhost:3000
+import os
+
+frontend_url = os.getenv("FRONTEND_URL", "")
+origins = ["http://localhost:3000", "http://localhost:3001"]
+if frontend_url:
+    origins.append(frontend_url)
+
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -116,4 +123,6 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
