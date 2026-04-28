@@ -13,7 +13,7 @@ from database import Base, engine
 from models.user import User
 from models.dataset import Dataset
 
-from routes import upload, metrics, candidates, shortlist, reports, auth
+from routes import upload, metrics, candidates, shortlist, reports, auth, ai
 
 # Base.metadata.create_all(bind=engine) - Moved to startup event
 
@@ -63,6 +63,7 @@ app.include_router(metrics.router, tags=["Fairness Analysis"])
 app.include_router(candidates.router, tags=["Candidate Data"])
 app.include_router(shortlist.router, tags=["Shortlisting"])
 app.include_router(reports.router, tags=["Reports"])
+app.include_router(ai.router, prefix="/ai", tags=["AI Insights"])
 
 
 # Health check endpoint
