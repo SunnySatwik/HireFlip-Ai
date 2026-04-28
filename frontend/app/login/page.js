@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Zap, Mail, Lock, ArrowRight, CheckCircle2, ChevronLeft } from 'lucide-react'
 
 export default function LoginPage() {
@@ -14,8 +14,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const registered = searchParams.get('registered')
+  const [registered, setRegistered] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      setRegistered(params.get("registered") === "true")
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
