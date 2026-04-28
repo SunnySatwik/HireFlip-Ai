@@ -9,13 +9,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-# Import route modules
-from routes import upload, metrics, candidates, shortlist, reports
+from database import Base, engine
+from models.user import User
 
-# Initialize FastAPI app
+from routes import upload, metrics, candidates, shortlist, reports, auth
+
+# Base.metadata.create_all(bind=engine) - Moved to startup event
+
 app = FastAPI(
     title="AI Hiring Fairness Auditor",
-    description="Backend API for auditing hiring fairness and detecting bias",
     version="1.0.0"
 )
 
@@ -37,13 +39,24 @@ async def startup_event():
     Load default dataset when server starts.
     This ensures the dashboard has data immediately without requiring CSV upload.
     """
-    print("🚀 Starting AI Hiring Fairness Auditor Backend...")
-    print("📂 Attempting to load default dataset from sample_data/candidates.csv...")
+    print("[INFO] Starting AI Hiring Fairness Auditor Backend...")
+    
+    # Initialize database tables
+    try:
+        print("[DB] Initializing database tables...")
+        Base.metadata.create_all(bind=engine)
+        print("[SUCCESS] Database tables initialized.")
+    except Exception as e:
+        print(f"[ERROR] Error initializing database: {str(e)}")
+        print("[WARN] Application will continue, but database-dependent features may fail.")
+
+    print("[INFO] Attempting to load default dataset from sample_data/candidates.csv...")
     upload.load_default_dataset()
-    print("✨ Backend ready!")
+    print("[SUCCESS] Backend ready!")
 
 
 # Register route routers
+app.include_router(auth.router)
 app.include_router(upload.router, tags=["Data Management"])
 app.include_router(metrics.router, tags=["Fairness Analysis"])
 app.include_router(candidates.router, tags=["Candidate Data"])

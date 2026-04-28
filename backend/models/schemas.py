@@ -65,3 +65,29 @@ class ReportResponse(BaseModel):
     fairnessMetrics: Dict[str, Any]
     summary: str
     recommendations: List[str]
+
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    company_name: str
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class UserOut(BaseModel):
+    id: int
+    email: str
+    company_name: str
+    created_at: Any
+
+    class Config:
+        from_attributes = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

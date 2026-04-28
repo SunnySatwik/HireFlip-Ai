@@ -63,7 +63,7 @@ def load_default_dataset():
 
     try:
         if not default_csv_path.exists():
-            print(f"⚠️  Default CSV not found at {default_csv_path}")
+            print(f"[WARN] Default CSV not found at {default_csv_path}")
             return False
 
         # Read the CSV file
@@ -71,7 +71,7 @@ def load_default_dataset():
             content = f.read()
 
         if len(content) == 0:
-            print(f"⚠️  Default CSV is empty at {default_csv_path}")
+            print(f"[WARN] Default CSV is empty at {default_csv_path}")
             return False
 
         # Parse CSV
@@ -79,7 +79,7 @@ def load_default_dataset():
 
         # Validate required columns
         if not validate_required_columns(df):
-            print("⚠️  Default CSV missing required columns: name, experience, qualification, gender")
+            print("[WARN] Default CSV missing required columns: name, experience, qualification, gender")
             return False
 
         # Normalize data
@@ -94,11 +94,11 @@ def load_default_dataset():
         current_dataset["row_count"] = len(df)
         current_dataset["source"] = "default"
 
-        print(f"✅ Default dataset loaded: {len(df)} candidates from {default_csv_path.name}")
+        print(f"[SUCCESS] Default dataset loaded: {len(df)} candidates from {default_csv_path.name}")
         return True
 
     except Exception as e:
-        print(f"⚠️  Error loading default dataset: {str(e)}")
+        print(f"[ERROR] Error loading default dataset: {str(e)}")
         return False
 
 
