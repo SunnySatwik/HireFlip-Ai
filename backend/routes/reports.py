@@ -2,17 +2,18 @@
 Audit report endpoint.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
 from models.schemas import ReportResponse
 from services.fairness_engine import get_fairness_metrics
 from routes.upload import get_current_dataset
+import pandas as pd
 
 router = APIRouter()
 
 
 @router.get("/report", response_model=ReportResponse)
-async def get_report():
+async def get_report(df: pd.DataFrame = Depends(get_current_dataset)):
     """
     Generate comprehensive fairness audit report.
 
@@ -20,8 +21,6 @@ async def get_report():
         ReportResponse with audit summary and recommendations
     """
     try:
-        df = get_current_dataset()
-
         # Calculate metrics
         metrics = get_fairness_metrics(df)
 

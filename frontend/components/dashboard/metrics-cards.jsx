@@ -39,9 +39,16 @@ export function MetricsCards() {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        const res = await fetch('http://localhost:8000/metrics')
-        const data = await res.json()
-        setMetrics(data)
+        const token = localStorage.getItem('hireflip_token')
+        const res = await fetch('http://localhost:8000/metrics', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setMetrics(data)
+        }
       } catch (err) {
         console.error('Failed to load metrics', err)
       }
@@ -51,42 +58,48 @@ export function MetricsCards() {
   }, [])
 
   if (!metrics) {
-    return <p className="text-muted-foreground">Loading metrics...</p>
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-32 bg-card/50 border border-border rounded-xl" />
+        ))}
+      </div>
+    )
   }
 
   const metricsData = [
     {
       label: 'Fairness Score',
-      value: metrics.fairnessScore,
+      value: metrics.fairnessScore || 0,
       unit: '',
-      trend: '+6',
+      trend: '+0',
       trendPositive: true,
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-500/10',
     },
     {
       label: 'Demographic Parity',
-      value: Math.round(metrics.demographicParity * 100),
+      value: Math.round((metrics.demographicParity || 0) * 100),
       unit: '%',
-      trend: metrics.demographicParityStatus || 'Improving',
+      trend: 'Audit Target',
       trendPositive: true,
       color: 'from-emerald-500 to-cyan-500',
       bgColor: 'bg-emerald-500/10',
     },
     {
       label: 'Equalized Odds',
-      value: Math.round(metrics.equalizedOdds * 100),
+      value: Math.round((metrics.equalizedOdds || 0) * 100),
       unit: '%',
-      trend: metrics.equalizedOddsStatus || 'Good',
+      trend: 'Statistical Goal',
       trendPositive: true,
       color: 'from-blue-500 to-purple-500',
       bgColor: 'bg-blue-500/10',
     },
     {
       label: 'Bias Risk Level',
-      value: metrics.biasRiskLevel,
+      value: metrics.biasRiskLevel || 'N/A',
       unit: '',
-      trend: 'Trending Down',
+      trend: 'Calculated Risk',
       trendPositive: true,
       color: 'from-orange-500 to-red-500',
       bgColor: 'bg-orange-500/10',

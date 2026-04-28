@@ -2,24 +2,24 @@
 Fairness metrics endpoint.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime
 from models.schemas import MetricsResponse
 from services.fairness_engine import get_fairness_metrics
 from services.shortlist import add_fairness_adjusted_scores
 from routes.upload import get_current_dataset
+import pandas as pd
 
 router = APIRouter()
 
 
 @router.get("/metrics", response_model=MetricsResponse)
-async def get_metrics():
+async def get_metrics(df: pd.DataFrame = Depends(get_current_dataset)):
     """
     Get fairness metrics for the final processed candidate results.
     Refined for business dashboard realism and small dataset sensitivity.
     """
     try:
-        df = get_current_dataset()
         df = add_fairness_adjusted_scores(df)
         
         dataset_size = len(df)
@@ -95,11 +95,6 @@ async def get_metrics():
             acceptanceTrend=metrics_from_engine.get("acceptanceTrend"),
             demographicDistribution=metrics_from_engine.get("demographicDistribution")
         )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error calculating metrics: {str(e)}")
 
     except HTTPException:
         raise

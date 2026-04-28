@@ -12,6 +12,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  LabelList,
+  Cell
 } from 'recharts'
 
 import { useState, useEffect } from 'react'
@@ -24,19 +26,26 @@ export function ChartsSection() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        const token = localStorage.getItem('hireflip_token')
+        const headers = {
+          'Authorization': `Bearer ${token}`
+        }
+
         const [metricsRes, candidatesRes] = await Promise.all([
-          fetch('http://localhost:8000/metrics'),
-          fetch('http://localhost:8000/candidates')
+          fetch('http://localhost:8000/metrics', { headers }),
+          fetch('http://localhost:8000/candidates', { headers })
         ]);
         
-        const metricsData = await metricsRes.json();
-        const candidatesData = await candidatesRes.json();
-        
-        setChartData({
-          trend: metricsData.acceptanceTrend || [],
-          distribution: metricsData.demographicDistribution || []
-        })
-        setCandidates(candidatesData.candidates || [])
+        if (metricsRes.ok && candidatesRes.ok) {
+          const metricsData = await metricsRes.json();
+          const candidatesData = await candidatesRes.json();
+          
+          setChartData({
+            trend: metricsData.acceptanceTrend || [],
+            distribution: metricsData.demographicDistribution || []
+          })
+          setCandidates(candidatesData.candidates || [])
+        }
       } catch (err) {
         console.error('Failed to load chart data', err)
       } finally {
@@ -122,7 +131,7 @@ export function ChartsSection() {
           </div>
         ) : dynamicTrend.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={dynamicTrend}>
+            <BarChart data={dynamicTrend} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
               <XAxis 
                 dataKey="period" 
@@ -145,22 +154,22 @@ export function ChartsSection() {
                     const data = payload[0].payload;
                     return (
                       <div className="bg-[#111] border border-[#333] p-3 rounded-lg shadow-xl text-xs">
-                        <p className="font-bold mb-2 text-white">{label}</p>
+                        <p className="font-bold mb-2 text-white">Experience: {label}</p>
                         <div className="flex justify-between gap-4 mb-1">
                           <span className="text-muted-foreground">Acceptance Rate:</span>
                           <span className="text-purple-400 font-bold">{data.acceptanceRate}%</span>
                         </div>
                         <div className="flex justify-between gap-4 mb-1">
                           <span className="text-muted-foreground">Shortlisted:</span>
-                          <span>{data.shortlistedCount}</span>
+                          <span className="text-white">{data.shortlistedCount} candidates</span>
                         </div>
                         <div className="flex justify-between gap-4 mb-1">
-                          <span className="text-muted-foreground">Total in Bucket:</span>
-                          <span>{data.totalInBucket}</span>
+                          <span className="text-muted-foreground">Total Applicants:</span>
+                          <span className="text-white">{data.totalInBucket} candidates</span>
                         </div>
                         {data.isLowSample && (
                           <p className="mt-2 pt-2 border-t border-[#333] text-amber-500 font-medium">
-                            ⚠️ Low sample size
+                            ⚠️ Low sample size for reliable audit
                           </p>
                         )}
                       </div>
@@ -171,11 +180,34 @@ export function ChartsSection() {
               />
               <Bar
                 dataKey="acceptanceRate"
+                fill="#a855f7"
                 radius={[4, 4, 0, 0]}
-                barSize={40}
+                barSize={50}
               >
+                <LabelList 
+                  dataKey="acceptanceRate" 
+                  position="top" 
+                  offset={10}
+                  content={(props) => {
+                    const { x, y, width, value, index } = props;
+                    const data = dynamicTrend[index];
+                    if (!data) return null;
+                    return (
+                      <text 
+                        x={x + width / 2} 
+                        y={y - 10} 
+                        fill="#a855f7" 
+                        fontSize={10} 
+                        fontWeight="bold"
+                        textAnchor="middle"
+                      >
+                        {`${value}% (${data.shortlistedCount}/${data.totalInBucket})`}
+                      </text>
+                    );
+                  }}
+                />
                 {dynamicTrend.map((entry, index) => (
-                  <cell 
+                  <Cell 
                     key={`cell-${index}`} 
                     fill="#a855f7" 
                     fillOpacity={entry.isLowSample ? 0.3 : 1} 

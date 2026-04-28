@@ -3,7 +3,7 @@ Candidates list endpoint.
 """
 
 import pandas as pd
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from models.schemas import CandidatesResponse, Candidate
 from services.shortlist import add_fairness_adjusted_scores, classify_candidate_status
 from services.fairness_engine import calculate_candidate_confidence, calculate_gender_influence
@@ -13,16 +13,11 @@ router = APIRouter()
 
 
 @router.get("/candidates", response_model=CandidatesResponse)
-async def get_candidates():
+async def get_candidates(df: pd.DataFrame = Depends(get_current_dataset)):
     """
-    Get processed candidates list with fairness adjustments and decision factors.
-
-    Returns:
-        CandidatesResponse with all candidates and their scores, status, confidence, and decision factors
+    Get processed candidates list with fairness adjustments and decision factors for the current user.
     """
     try:
-        df = get_current_dataset()
-
         # Add fairness adjusted scores
         df = add_fairness_adjusted_scores(df)
 

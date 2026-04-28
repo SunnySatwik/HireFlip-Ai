@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from database import Base, engine
 from models.user import User
+from models.dataset import Dataset
 
 from routes import upload, metrics, candidates, shortlist, reports, auth
 

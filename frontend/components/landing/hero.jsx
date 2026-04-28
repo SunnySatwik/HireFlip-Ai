@@ -2,9 +2,26 @@
 
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import Link from "next/link"
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export function Hero() {
+  const router = useRouter()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem('hireflip_token')
+    setIsLoggedIn(!!token)
+  }, [])
+
+  const handleCtaClick = () => {
+    if (isLoggedIn) {
+      router.push('/dashboard')
+    } else {
+      router.push('/signup')
+    }
+  }
+
   const scrollToDemo = () => {
     const demoElement = document.getElementById('demo-preview')
     if (demoElement) {
@@ -57,14 +74,13 @@ export function Hero() {
           variants={itemVariants}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
-          <Link href="/dashboard">
           <Button
             size="lg"
+            onClick={handleCtaClick}
             className="bg-purple-600 hover:bg-purple-700 text-white h-12 px-8 text-base font-semibold rounded-lg"
           >
             Start Free Audit
           </Button>
-          </Link>
           <Button
             size="lg"
             variant="outline"

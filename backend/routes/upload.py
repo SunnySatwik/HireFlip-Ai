@@ -1,41 +1,30 @@
-"""
-CSV upload endpoint for candidate data.
-"""
-
-import os
-from pathlib import Path
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+from sqlalchemy.orm import Session
+from database import get_db
+from auth import get_current_user
+from models.user import User
+from models.dataset import Dataset
 from models.schemas import UploadResponse
 from services.csv_parser import parse_csv_file, normalize_dataframe, validate_required_columns
 from services.fairness_engine import calculate_deterministic_score
-
+import pandas as pd
+import io
+from pathlib import Path
 router = APIRouter()
 
-# In-memory storage for current session
-current_dataset = {
-    "df": None,
-    "columns": [],
-    "row_count": 0,
-    "source": None  # Track whether data came from default or upload
-}
-
+# In-memory cache for the current session's processed dataframe
+# This avoids re-parsing and re-scoring on every request
+_dataframe_cache = {}
 
 def apply_deterministic_scoring(df):
     """
     Apply deterministic scoring to candidates.
-
-    Replaces random scoring with real multi-factor scoring based on:
-    - Experience (50% weight)
-    - Qualification level (30% weight) - smarter, role-aware qualification scoring
-    - Salary fit (20% weight) - budget band based, ethical (does not reward cheap candidates)
     """
     if 'score' in df.columns:
-        return df  # Use existing scores if present
+        return df
 
     max_exp = df['experience'].max() if df['experience'].max() > 0 else 1
     max_salary = df['salary_expectation'].max() if 'salary_expectation' in df.columns else 100000
-
-    # Calculate median salary for ethical budget band calculation
     median_salary = df['salary_expectation'].median() if 'salary_expectation' in df.columns and len(df) > 0 else None
 
     scores = []
@@ -54,104 +43,58 @@ def apply_deterministic_scoring(df):
 
 def load_default_dataset():
     """
-    Load default dataset from sample_data/candidates.csv on startup.
-
-    Called by FastAPI startup event to initialize dashboard with sample data.
-    If CSV is missing, silently logs but doesn't crash.
+    Keep as fallback/init logic if needed, but per-user system is primary.
     """
     default_csv_path = Path(__file__).parent.parent / "sample_data" / "candidates.csv"
-
-    try:
-        if not default_csv_path.exists():
-            print(f"[WARN] Default CSV not found at {default_csv_path}")
-            return False
-
-        # Read the CSV file
-        with open(default_csv_path, 'rb') as f:
-            content = f.read()
-
-        if len(content) == 0:
-            print(f"[WARN] Default CSV is empty at {default_csv_path}")
-            return False
-
-        # Parse CSV
-        df, columns = parse_csv_file(content)
-
-        # Validate required columns
-        if not validate_required_columns(df):
-            print("[WARN] Default CSV missing required columns: name, experience, qualification, gender")
-            return False
-
-        # Normalize data
-        df = normalize_dataframe(df)
-
-        # Apply deterministic scoring
-        df = apply_deterministic_scoring(df)
-
-        # Store in memory
-        current_dataset["df"] = df
-        current_dataset["columns"] = df.columns.tolist()
-        current_dataset["row_count"] = len(df)
-        current_dataset["source"] = "default"
-
-        print(f"[SUCCESS] Default dataset loaded: {len(df)} candidates from {default_csv_path.name}")
-        return True
-
-    except Exception as e:
-        print(f"[ERROR] Error loading default dataset: {str(e)}")
+    if not default_csv_path.exists():
         return False
+    return True
 
 
 @router.post("/upload-csv", response_model=UploadResponse)
-async def upload_csv(file: UploadFile = File(...)):
+async def upload_csv(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
-    Upload and parse CSV file containing candidate data.
-
-    Expected columns: name, experience, qualification, gender (and optional others)
-
-    Args:
-        file: CSV file upload
-
-    Returns:
-        UploadResponse with row count and detected columns
+    Upload and save CSV file for the current user.
     """
     if not file.filename.endswith('.csv'):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted")
 
     try:
-        # Read file content
         content = await file.read()
-
         if len(content) == 0:
             raise HTTPException(status_code=400, detail="File is empty")
 
-        # Parse CSV
-        df, columns = parse_csv_file(content)
-
-        # Validate required columns
+        # Validate CSV structure before saving
+        df, _ = parse_csv_file(content)
         if not validate_required_columns(df):
             raise HTTPException(
                 status_code=400,
                 detail="CSV must contain: name, experience, qualification, gender"
             )
 
-        # Normalize data
-        df = normalize_dataframe(df)
+        # Save to database
+        new_dataset = Dataset(
+            user_id=current_user.id,
+            filename=file.filename,
+            content=content
+        )
+        db.add(new_dataset)
+        db.commit()
+        db.refresh(new_dataset)
 
-        # Apply deterministic scoring
-        df = apply_deterministic_scoring(df)
-
-        # Store in memory
-        current_dataset["df"] = df
-        current_dataset["columns"] = df.columns.tolist()
-        current_dataset["row_count"] = len(df)
-        current_dataset["source"] = "upload"
+        # Clear cache for this user
+        if current_user.id in _dataframe_cache:
+            del _dataframe_cache[current_user.id]
 
         return UploadResponse(
             success=True,
             rowCount=len(df),
             columns=df.columns.tolist(),
-            message=f"Successfully uploaded {len(df)} candidates"
+            message=f"Successfully uploaded {file.filename}"
         )
 
     except HTTPException:
@@ -160,11 +103,34 @@ async def upload_csv(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 
 
-def get_current_dataset():
-    """Get the currently loaded dataset."""
-    if current_dataset["df"] is None:
+def get_current_dataset(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> pd.DataFrame:
+    """
+    Dependency to get the latest processed dataset for the current user.
+    """
+    # Check cache first
+    if current_user.id in _dataframe_cache:
+        return _dataframe_cache[current_user.id]
+
+    # Load latest from DB
+    dataset = db.query(Dataset).filter(Dataset.user_id == current_user.id).order_by(Dataset.uploaded_at.desc()).first()
+    
+    if not dataset:
         raise HTTPException(
-            status_code=400,
-            detail="No dataset loaded. Default dataset failed to load on startup. Please upload a CSV file to proceed."
+            status_code=404,
+            detail="No dataset found. Please upload a CSV file to begin."
         )
-    return current_dataset["df"]
+
+    content = dataset.content
+
+    # Parse and process
+    df, _ = parse_csv_file(content)
+    df = normalize_dataframe(df)
+    df = apply_deterministic_scoring(df)
+    
+    # Cache for session
+    _dataframe_cache[current_user.id] = df
+    
+    return df

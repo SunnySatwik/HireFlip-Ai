@@ -88,11 +88,10 @@ export function ExplanationModal({ candidate, onClose }) {
                 <h2 className="text-2xl font-bold text-foreground">
                   {candidate.name}
                 </h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  candidate.status === 'Shortlisted' ? 'bg-green-500/20 text-green-500' :
-                  candidate.status === 'In Review' ? 'bg-yellow-500/20 text-yellow-500' :
-                  'bg-red-500/20 text-red-500'
-                }`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${candidate.status === 'Shortlisted' ? 'bg-green-500/20 text-green-500' :
+                    candidate.status === 'In Review' ? 'bg-yellow-500/20 text-yellow-500' :
+                      'bg-red-500/20 text-red-500'
+                  }`}>
                   {candidate.status || 'In Review'}
                 </span>
               </div>
@@ -185,19 +184,16 @@ export function ExplanationModal({ candidate, onClose }) {
             {/* Fairness Analysis */}
             <div>
               <h3 className="font-semibold text-foreground mb-3">Fairness Analysis</h3>
-              <div className={`p-4 rounded-lg border ${
-                hasPositiveFairness
+              <div className={`p-4 rounded-lg border ${hasPositiveFairness
                   ? 'bg-emerald-500/10 border-emerald-500/30'
                   : 'bg-blue-500/10 border-blue-500/30'
-              }`}>
+                }`}>
                 <div className="flex items-start gap-3">
-                  <Check className={`w-5 h-5 shrink-0 mt-0.5 ${
-                    hasPositiveFairness ? 'text-emerald-400' : 'text-blue-400'
-                  }`} />
+                  <Check className={`w-5 h-5 shrink-0 mt-0.5 ${hasPositiveFairness ? 'text-emerald-400' : 'text-blue-400'
+                    }`} />
                   <div>
-                    <p className={`font-semibold mb-1 ${
-                      hasPositiveFairness ? 'text-emerald-400' : 'text-blue-400'
-                    }`}>
+                    <p className={`font-semibold mb-1 ${hasPositiveFairness ? 'text-emerald-400' : 'text-blue-400'
+                      }`}>
                       {hasPositiveFairness ? 'Fairness Boost Applied' : 'No Fairness Adjustment'}
                     </p>
                     <p className="text-sm text-muted-foreground">

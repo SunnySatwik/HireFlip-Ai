@@ -22,9 +22,16 @@ export function CandidateTable() {
   useEffect(() => {
     const loadCandidates = async () => {
       try {
-        const res = await fetch('http://localhost:8000/candidates')
-        const data = await res.json()
-        setCandidates(Array.isArray(data) ? data : data.candidates || [])
+        const token = localStorage.getItem('hireflip_token')
+        const res = await fetch('http://localhost:8000/candidates', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setCandidates(Array.isArray(data) ? data : data.candidates || [])
+        }
       } catch (error) {
         console.error('Failed to load candidates:', error)
       } finally {

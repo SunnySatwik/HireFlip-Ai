@@ -2,11 +2,38 @@
 import Link from "next/link";
 import { motion } from 'framer-motion'
 import { ChevronDown, LogOut, User, Settings } from 'lucide-react'
-import { currentUser } from '@/data/mock-data'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+import { useRouter } from 'next/navigation'
 
 export function TopNavbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('hireflip_token')
+        const res = await fetch('http://localhost:8000/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch user', err)
+      }
+    }
+    fetchUser()
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('hireflip_token')
+    localStorage.removeItem('hireflip_user')
+    router.push('/login')
+  }
 
   return (
     <motion.header
@@ -32,21 +59,28 @@ export function TopNavbar() {
           {/* User profile */}
           <div className="relative flex items-center gap-3 pl-4 border-l border-border">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-foreground">{currentUser.name}</p>
-              <p className="text-xs text-muted-foreground">{currentUser.role}</p>
+              <p className="text-sm font-medium text-foreground">
+                {user?.display_name || user?.email?.split('@')[0] || 'Auditor'}
+              </p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                {user?.company_name || 'HireFlip AI'}
+              </p>
             </div>
 
             <motion.button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               whileHover={{ scale: 1.05 }}
-              className="relative"
+              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-emerald-500 p-[2px]"
             >
-              <img
-                src={currentUser.avatar}
-                alt={currentUser.name}
-                className="w-10 h-10 rounded-full border-2 border-purple-500/30 hover:border-purple-500 transition-colors"
-              />
+              <div className="w-full h-full rounded-[10px] bg-card overflow-hidden flex items-center justify-center">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-5 h-5 text-purple-400" />
+                )}
+              </div>
             </motion.button>
+
 
             {isUserMenuOpen && (
               <motion.div
@@ -54,16 +88,18 @@ export function TopNavbar() {
                 animate={{ opacity: 1, y: 0 }}
                 className="absolute right-0 mt-48 w-48 bg-card border border-border rounded-lg shadow-lg overflow-hidden"
               >
-                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground">
-                  <User className="w-4 h-4" />
-                  Profile
-                </button>
-                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground">
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </button>
+
+                <Link href="/dashboard/settings" className="w-full">
+                  <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-background/50 transition-colors text-sm text-foreground">
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </button>
+                </Link>
                 <div className="border-t border-border" />
-                <button className="w-full flex items-center gap-2 px-4 py-3 hover:bg-red-500/10 transition-colors text-sm text-red-400">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-4 py-3 hover:bg-red-500/10 transition-colors text-sm text-red-400"
+                >
                   <LogOut className="w-4 h-4" />
                   Logout
                 </button>

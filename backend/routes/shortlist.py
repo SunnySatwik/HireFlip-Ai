@@ -2,7 +2,7 @@
 Shortlist comparison endpoint.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from models.schemas import ShortlistResponse, Candidate
 import pandas as pd
 from services.shortlist import get_shortlist_comparison
@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("/shortlist", response_model=ShortlistResponse)
-async def get_shortlist():
+async def get_shortlist(df: pd.DataFrame = Depends(get_current_dataset)):
     """
     Get original vs fairness-adjusted shortlist comparison with decision factors.
 
@@ -21,8 +21,6 @@ async def get_shortlist():
         ShortlistResponse with both shortlists, decision factors, and comparison details
     """
     try:
-        df = get_current_dataset()
-
         # Get shortlist comparison
         comparison = get_shortlist_comparison(df, top_n=10)
 

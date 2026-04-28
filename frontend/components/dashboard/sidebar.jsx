@@ -6,10 +6,10 @@ import { BarChart3, Zap, Users, FileText, Settings, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 const menuItems = [
-  { icon: BarChart3, label: 'Overview', href: '#', active: true },
+  { icon: BarChart3, label: 'Overview', href: '/dashboard', active: true },
   { icon: Users, label: 'Candidates', href: '#', active: false },
   { icon: FileText, label: 'Reports', href: '#', active: false },
-  { icon: Settings, label: 'Settings', href: '#', active: false },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings', active: false },
 ]
 
 export function Sidebar() {
@@ -47,11 +47,10 @@ export function Sidebar() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.05 * (index + 1) }}
               whileHover={{ x: 4 }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                item.active
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${item.active
                   ? 'bg-sidebar-primary text-sidebar-primary-foreground'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent/30'
-              }`}
+                }`}
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>

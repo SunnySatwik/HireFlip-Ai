@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from database import get_db
 from models.user import User
-from models.schemas import UserCreate, UserLogin, UserOut, Token
+from models.schemas import UserCreate, UserLogin, UserOut, Token, UserProfileUpdate, UserPasswordUpdate
 from auth import get_password_hash, verify_password, create_access_token, get_current_user, ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -51,3 +51,44 @@ def login(user_in: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.put("/profile", response_model=UserOut)
+def update_profile(
+    profile_in: UserProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update current user's profile information."""
+    if profile_in.display_name is not None:
+        current_user.display_name = profile_in.display_name
+    if profile_in.company_name is not None:
+        current_user.company_name = profile_in.company_name
+    if profile_in.avatar_url is not None:
+        current_user.avatar_url = profile_in.avatar_url
+    if profile_in.theme is not None:
+        current_user.theme = profile_in.theme
+
+    db.add(current_user)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.put("/password")
+def update_password(
+    pass_in: UserPasswordUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Update current user's password."""
+    if not verify_password(pass_in.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect current password"
+        )
+    
+    current_user.password_hash = get_password_hash(pass_in.new_password)
+    db.add(current_user)
+    db.commit()
+    return {"message": "Password updated successfully"}
