@@ -17,11 +17,15 @@ import {
 } from 'recharts'
 
 import { useState, useEffect } from 'react'
+import { useCandidateDecisions } from '../../hooks/use-candidate-decisions'
 
 export function ChartsSection() {
   const [chartData, setChartData] = useState({ trend: [], distribution: [] })
   const [candidates, setCandidates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [demographicCategory, setDemographicCategory] = useState('gender')
+  
+  const { getAppliedStatus } = useCandidateDecisions()
 
   useEffect(() => {
     const loadData = async () => {
@@ -44,7 +48,14 @@ export function ChartsSection() {
             trend: metricsData.acceptanceTrend || [],
             distribution: metricsData.demographicDistribution || []
           })
-          setCandidates(candidatesData.candidates || [])
+
+          const rawCandidates = candidatesData.candidates || candidatesData || []
+          const candidatesWithDecisions = (Array.isArray(rawCandidates) ? rawCandidates : []).map(c => ({
+            ...c,
+            status: getAppliedStatus(c.id, c.status)
+          }))
+          
+          setCandidates(candidatesWithDecisions)
         }
       } catch (err) {
         console.error('Failed to load chart data', err)
@@ -76,7 +87,7 @@ export function ChartsSection() {
 
     return buckets.map(b => {
       const inBucket = candidates.filter(c => c.experience >= b.min && c.experience <= b.max);
-      const shortlisted = inBucket.filter(c => c.fairnessAdjustedScore >= 80).length;
+      const shortlisted = inBucket.filter(c => c.status === 'Shortlisted').length;
       const total = inBucket.length;
       
       return {
@@ -89,7 +100,31 @@ export function ChartsSection() {
     });
   };
 
+  // Dynamic demographic funnel calculation
+  const getDynamicDistribution = () => {
+    if (!candidates.length) return [];
+    
+    // Get unique values for the selected category
+    const categories = Array.from(new Set(candidates.map(c => c[demographicCategory] || 'Other')));
+    
+    return categories.map(cat => {
+      const inGroup = candidates.filter(c => (c[demographicCategory] || 'Other') === cat);
+      const shortlisted = inGroup.filter(c => c.status === 'Shortlisted').length;
+      const inReview = inGroup.filter(c => c.status === 'In Review').length;
+      const rejected = inGroup.filter(c => c.status === 'Rejected').length;
+      
+      return {
+        category: cat,
+        shortlisted,
+        inReview,
+        rejected,
+        total: inGroup.length
+      };
+    });
+  };
+
   const dynamicTrend = getDynamicTrend();
+  const dynamicDistribution = getDynamicDistribution();
   const totalCandidates = candidates.length;
   const isTooSparse = totalCandidates > 0 && totalCandidates < 8;
 
@@ -230,7 +265,27 @@ export function ChartsSection() {
         whileInView="visible"
         className="p-6 rounded-xl bg-card border border-border"
       >
-        <h3 className="font-semibold mb-6">Hiring Funnel by Demographic</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-semibold text-sm md:text-base">Hiring Funnel by Demographic</h3>
+          <div className="flex bg-muted p-1 rounded-lg border border-border">
+            {[
+              { id: 'gender', label: 'Gender' },
+              { id: 'caste', label: 'Caste' }
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setDemographicCategory(cat.id)}
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                  demographicCategory === cat.id 
+                    ? 'bg-purple-600 text-white shadow-sm' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {isTooSparse ? (
           <div className="h-[300px] flex flex-col items-center justify-center text-center p-6 border border-dashed rounded-lg bg-muted/5">
@@ -238,10 +293,10 @@ export function ChartsSection() {
             <p className="text-muted-foreground text-sm font-medium">Insufficient population for funnel audit</p>
             <p className="text-xs text-muted-foreground/60 mt-1">(Add more candidates to see group distribution)</p>
           </div>
-        ) : chartData.distribution.filter(d => d.total > 0).length > 0 ? (
+        ) : dynamicDistribution.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart 
-              data={chartData.distribution.filter(d => d.total > 0)}
+              data={dynamicDistribution}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
@@ -288,9 +343,9 @@ export function ChartsSection() {
                 iconType="circle"
                 wrapperStyle={{ paddingBottom: '20px', fontSize: '12px' }}
               />
-              <Bar dataKey="shortlisted" name="Shortlisted" stackId="a" fill="#10b981" barSize={32} />
-              <Bar dataKey="inReview" name="In Review" stackId="a" fill="#f59e0b" barSize={32} />
-              <Bar dataKey="rejected" name="Rejected" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={32} />
+              <Bar dataKey="shortlisted" name="Shortlisted" stackId="a" fill="#10b981" barSize={55} />
+              <Bar dataKey="inReview" name="In Review" stackId="a" fill="#f59e0b" barSize={55} />
+              <Bar dataKey="rejected" name="Rejected" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} barSize={55} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -325,7 +380,7 @@ export function ChartsSection() {
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Total Demographic Groups</p>
             <p className="text-xl font-bold text-purple-500">
-              {chartData.distribution.length}
+              {dynamicDistribution.length}
             </p>
           </div>
           <div className="space-y-1">

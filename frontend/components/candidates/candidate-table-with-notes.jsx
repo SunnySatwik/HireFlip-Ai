@@ -2,28 +2,35 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Info, Search, ArrowUpDown, X } from 'lucide-react'
-import { ExplanationModal } from './explanation-modal'
+import { ChevronLeft, ChevronRight, Info, Search, ArrowUpDown, X, FileText, Download } from 'lucide-react'
+import { ExplanationModal } from '../dashboard/explanation-modal'
+import { RecruiterNotesModal } from './recruiter-notes-modal'
+import { useCandidateNotes } from '../../hooks/use-candidate-notes'
 import { useCandidateDecisions } from '../../hooks/use-candidate-decisions'
 import { useToast } from '../../hooks/use-toast'
+import { generateCandidateCSV, downloadCSV } from '../../utils/csv-export'
 
-export function CandidateTable({ itemsPerPage = 5 } = {}) {
+export function CandidateTableWithNotes({ itemsPerPage = 15 } = {}) {
   const [candidates, setCandidates] = useState([])
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCandidate, setSelectedCandidate] = useState(null)
-
-  // Decisions management
-  const { approveRecommendation, getAppliedStatus } = useCandidateDecisions()
-
-  // Toast notifications
-  const { toast } = useToast()
+  const [notesCandidateId, setNotesCandidateId] = useState(null)
 
   // Filter and sort states
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('score')
   const [sortOrder, setSortOrder] = useState('desc')
   const [statusFilter, setStatusFilter] = useState('all')
+
+  // Notes management
+  const { notes, getNote, hasNote, addOrUpdateNote, deleteNote } = useCandidateNotes()
+
+  // Decisions management
+  const { approveRecommendation, getAppliedStatus } = useCandidateDecisions()
+
+  // Toast notifications
+  const { toast } = useToast()
 
   useEffect(() => {
     const loadCandidates = async () => {
@@ -169,6 +176,12 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
     setCurrentPage(1)
   }
 
+  const handleExportCSV = () => {
+    const csv = generateCandidateCSV(filteredAndSortedCandidates)
+    const timestamp = new Date().toISOString().split('T')[0]
+    downloadCSV(csv, `candidates_${timestamp}.csv`)
+  }
+
   const handleApproveRecommendation = (candidateId, currentStatus) => {
     let nextStatus = currentStatus
     
@@ -213,17 +226,30 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
               {filteredAndSortedCandidates.length} of {candidates.length} candidates
             </p>
           </div>
-          {hasActiveFilters && (
+          <div className="flex gap-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={resetFilters}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 text-xs font-medium transition-colors"
+              onClick={handleExportCSV}
+              disabled={filteredAndSortedCandidates.length === 0}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed text-emerald-500 text-xs font-medium transition-colors"
+              title="Export filtered candidates to CSV"
             >
-              <X className="w-3 h-3" />
-              Reset Filters
+              <Download className="w-3 h-3" />
+              Export CSV
             </motion.button>
-          )}
+            {hasActiveFilters && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={resetFilters}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 text-xs font-medium transition-colors"
+              >
+                <X className="w-3 h-3" />
+                Reset Filters
+              </motion.button>
+            )}
+          </div>
         </div>
 
         {/* Controls: Search, Sort, Filter */}
@@ -333,7 +359,9 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
                   <p className="text-xs font-normal text-muted-foreground group-hover:text-muted-foreground">Impact %</p>
                 </th>
 
-                <th className="text-center py-3 px-4 font-semibold">Details</th>
+                <th className="text-left py-3 px-4 font-semibold">Recruiter Notes</th>
+
+                <th className="text-center py-3 px-4 font-semibold">Actions</th>
               </tr>
             </thead>
 
@@ -411,6 +439,22 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
                         </div>
                       </td>
 
+                      <td className="py-4 px-4">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setNotesCandidateId(candidate.id)}
+                          className={`p-2 rounded-lg transition-colors ${
+                            hasNote(candidate.id)
+                              ? 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-500'
+                              : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+                          }`}
+                          title={hasNote(candidate.id) ? 'Edit note' : 'Add note'}
+                        >
+                          <FileText className="w-4 h-4" />
+                        </motion.button>
+                      </td>
+
                       <td className="py-4 px-4 text-center">
                         <motion.button
                           whileHover={{ scale: 1.1 }}
@@ -426,7 +470,7 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="py-8 px-4 text-center text-muted-foreground">
+                    <td colSpan="7" className="py-8 px-4 text-center text-muted-foreground">
                       No candidates match your filters
                     </td>
                   </tr>
@@ -486,9 +530,19 @@ export function CandidateTable({ itemsPerPage = 5 } = {}) {
       <ExplanationModal
         candidate={selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
-        showAcceptButton={false}
         onApproveRecommendation={handleApproveRecommendation}
       />
+
+      {notesCandidateId && (
+        <RecruiterNotesModal
+          candidate={displayedCandidates.find(c => c.id === notesCandidateId) ||
+                    filteredAndSortedCandidates.find(c => c.id === notesCandidateId)}
+          initialNote={getNote(notesCandidateId)}
+          onSave={(noteText) => addOrUpdateNote(notesCandidateId, noteText)}
+          onDelete={() => deleteNote(notesCandidateId)}
+          onClose={() => setNotesCandidateId(null)}
+        />
+      )}
     </>
   )
 }

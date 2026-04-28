@@ -2,9 +2,21 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Check, AlertCircle, TrendingUp } from 'lucide-react'
+import { useCandidateDecisions } from '../../hooks/use-candidate-decisions'
 
-export function ExplanationModal({ candidate, onClose }) {
+export function ExplanationModal({ candidate, onClose, showAcceptButton = true, onApproveRecommendation }) {
+  const { getAppliedStatus } = useCandidateDecisions()
+  
   if (!candidate) return null
+
+  const currentStatus = getAppliedStatus(candidate.id, candidate.status)
+
+  const handleApprove = () => {
+    if (onApproveRecommendation) {
+      onApproveRecommendation(candidate.id, currentStatus)
+    }
+    onClose()
+  }
 
   // Safe access to decisionFactors with fallback
   const factors = candidate.decisionFactors || {
@@ -16,7 +28,7 @@ export function ExplanationModal({ candidate, onClose }) {
 
   // Generate recommendation based on status and score
   const getRecommendation = () => {
-    const status = candidate.status || 'In Review'
+    const status = currentStatus || 'In Review'
     const confidence = candidate.confidence || 50
 
     switch (status) {
@@ -88,11 +100,11 @@ export function ExplanationModal({ candidate, onClose }) {
                 <h2 className="text-2xl font-bold text-foreground">
                   {candidate.name}
                 </h2>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${candidate.status === 'Shortlisted' ? 'bg-green-500/20 text-green-500' :
-                    candidate.status === 'In Review' ? 'bg-yellow-500/20 text-yellow-500' :
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${currentStatus === 'Shortlisted' ? 'bg-green-500/20 text-green-500' :
+                    currentStatus === 'In Review' ? 'bg-yellow-500/20 text-yellow-500' :
                       'bg-red-500/20 text-red-500'
                   }`}>
-                  {candidate.status || 'In Review'}
+                  {currentStatus || 'In Review'}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">ID: {candidate.id}</p>
@@ -244,18 +256,23 @@ export function ExplanationModal({ candidate, onClose }) {
 
           {/* Footer Actions */}
           <div className="mt-8 pt-6 border-t border-border flex gap-3">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex-1 px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors"
-            >
-              Accept Recommendation
-            </motion.button>
+            {showAcceptButton && currentStatus !== 'Shortlisted' && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleApprove}
+                className="flex-1 px-4 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition-colors"
+              >
+                Approve AI Recommendation
+              </motion.button>
+            )}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-lg border border-border hover:bg-background/50 text-foreground font-semibold transition-colors"
+              className={`px-4 py-3 rounded-lg border border-border hover:bg-background/50 text-foreground font-semibold transition-colors ${
+                showAcceptButton ? 'flex-1' : 'w-full'
+              }`}
             >
               Close
             </motion.button>

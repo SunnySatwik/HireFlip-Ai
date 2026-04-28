@@ -68,6 +68,11 @@ export default function Dashboard() {
     setRefreshKey(prev => prev + 1)
   }, [])
 
+  useEffect(() => {
+    window.addEventListener('candidate-decision-updated', handleRefresh)
+    return () => window.removeEventListener('candidate-decision-updated', handleRefresh)
+  }, [handleRefresh])
+
   return (
     <AuthGuard>
       <div className="flex h-screen bg-background text-foreground">

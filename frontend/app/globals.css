@@ -217,3 +217,45 @@
     }
   }
 }
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .report-container {
+    margin: 0 !important;
+    padding: 20px !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure colors and backgrounds print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .bg-card, .bg-background {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  .text-muted-foreground {
+    color: #6b7280 !important;
+  }
+
+  /* Hide scrollbars in print */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

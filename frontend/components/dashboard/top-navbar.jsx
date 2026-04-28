@@ -4,12 +4,21 @@ import { motion } from 'framer-motion'
 import { ChevronDown, LogOut, User, Settings } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 export function TopNavbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [user, setUser] = useState(null)
   const router = useRouter()
+  const pathname = usePathname()
+
+  const getPageTitle = () => {
+    if (pathname === '/dashboard') return 'Overview'
+    if (pathname.includes('/candidates')) return 'Candidates'
+    if (pathname.includes('/reports')) return 'Reports'
+    if (pathname.includes('/settings')) return 'Settings'
+    return 'Overview'
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,10 +53,10 @@ export function TopNavbar() {
     >
       <div className="flex items-center justify-between gap-4">
         {/* Breadcrumb */}
-        <div className="text-sm text-muted-foreground">
-          <span>Dashboard</span>
-          <span className="mx-2">/</span>
-          <span className="text-foreground font-medium">Overview</span>
+        <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <span className="hover:text-foreground cursor-default transition-colors">Dashboard</span>
+          <span className="text-muted-foreground/40 font-light">/</span>
+          <span className="text-foreground font-semibold tracking-tight">{getPageTitle()}</span>
         </div>
 
         {/* Right section */}
