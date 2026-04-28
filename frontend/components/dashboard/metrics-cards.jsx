@@ -34,61 +34,8 @@ function AnimatedNumber({ end, duration = 1.5 }) {
   return <span ref={ref}>{count}</span>
 }
 
-export function MetricsCards() {
-  const [metrics, setMetrics] = useState(null)
-  const [candidates, setCandidates] = useState([])
-  const { decisions, getAppliedStatus } = useCandidateDecisions()
-  
-  const decisionCount = useMemo(() => Object.keys(decisions).length, [decisions])
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const token = localStorage.getItem('hireflip_token')
-        const headers = { 'Authorization': `Bearer ${token}` }
-        const [metRes, candRes] = await Promise.all([
-          fetch('http://localhost:8000/metrics', { headers }),
-          fetch('http://localhost:8000/candidates', { headers })
-        ])
-        
-        if (metRes.ok && candRes.ok) {
-          const metData = await metRes.json()
-          const candData = await candRes.json()
-          setMetrics(metData)
-          setCandidates(Array.isArray(candData) ? candData : candData.candidates || [])
-        }
-      } catch (err) {
-        console.error('Failed to load dashboard metrics', err)
-      }
-    }
-
-    loadData()
-  }, [])
-
-  const adjustedMetrics = useMemo(() => {
-    if (!metrics || !candidates.length) return metrics;
-    
-    // Calculate total manual interventions that improved candidate status
-    const manualImprovements = candidates.filter(c => {
-      const applied = getAppliedStatus(c.id, c.status)
-      // Improvement if moved to Shortlisted from anything else, or In Review from Rejected
-      return (applied === 'Shortlisted' && c.status !== 'Shortlisted') || 
-             (applied === 'In Review' && c.status === 'Rejected')
-    }).length;
-
-    const boost = manualImprovements * 0.4;
-    const percentageBoost = manualImprovements * 0.01;
-    
-    return {
-      ...metrics,
-      fairnessScore: Math.min(100, (metrics.fairnessScore || 0) + boost),
-      demographicParity: Math.min(1, (metrics.demographicParity || 0) + percentageBoost),
-      equalizedOdds: Math.min(1, (metrics.equalizedOdds || 0) + percentageBoost),
-      manualImprovements
-    };
-  }, [metrics, candidates, getAppliedStatus]);
-
-  if (!adjustedMetrics) {
+export function MetricsCards({ metrics, loading }) {
+  if (loading || !metrics) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
         {[1, 2, 3, 4].map((i) => (
@@ -101,34 +48,34 @@ export function MetricsCards() {
   const metricsData = [
     {
       label: 'Fairness Score',
-      value: adjustedMetrics.fairnessScore || 0,
+      value: metrics.fairnessScore || 0,
       unit: '',
-      trend: adjustedMetrics.manualImprovements > 0 ? `+${(adjustedMetrics.manualImprovements * 0.4).toFixed(1)}` : '+0',
+      trend: metrics.manualImprovements > 0 ? `+${(metrics.manualImprovements * 0.4).toFixed(1)}` : '+0',
       trendPositive: true,
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-500/10',
     },
     {
       label: 'Demographic Parity',
-      value: Math.round((adjustedMetrics.demographicParity || 0) * 100),
+      value: Math.round((metrics.demographicParity || 0) * 100),
       unit: '%',
-      trend: adjustedMetrics.manualImprovements > 0 ? `+${(adjustedMetrics.manualImprovements * 1).toFixed(1)}%` : 'Audit Target',
+      trend: metrics.manualImprovements > 0 ? `+${(metrics.manualImprovements * 1).toFixed(1)}%` : 'Audit Target',
       trendPositive: true,
       color: 'from-emerald-500 to-cyan-500',
       bgColor: 'bg-emerald-500/10',
     },
     {
       label: 'Equalized Odds',
-      value: Math.round((adjustedMetrics.equalizedOdds || 0) * 100),
+      value: Math.round((metrics.equalizedOdds || 0) * 100),
       unit: '%',
-      trend: adjustedMetrics.manualImprovements > 0 ? `+${(adjustedMetrics.manualImprovements * 1).toFixed(1)}%` : 'Statistical Goal',
+      trend: metrics.manualImprovements > 0 ? `+${(metrics.manualImprovements * 1).toFixed(1)}%` : 'Statistical Goal',
       trendPositive: true,
       color: 'from-blue-500 to-purple-500',
       bgColor: 'bg-blue-500/10',
     },
     {
       label: 'Bias Risk Level',
-      value: adjustedMetrics.biasRiskLevel || 'N/A',
+      value: metrics.biasRisk || 'N/A',
       unit: '',
       trend: 'Calculated Risk',
       trendPositive: true,
